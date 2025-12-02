@@ -3450,5 +3450,12 @@ utility.app.listen(utility.port, "0.0.0.0", () => {
 
 
 
-
+// Add health check endpoint
+utility.app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString()
+  });
+})
 
