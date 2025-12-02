@@ -1,0 +1,157 @@
+{
+  "sheets": [
+    {
+      "name": "Summary Processes",
+      "mappings": [
+        {
+          "cells": ["C4"],
+          "data_path": "get_cbam_details.organisation_details.0.organization_name"
+        },
+        {
+          "cells": ["C5"],
+          "data_path": [
+            "get_cbam_details.organisation_details.0.address_1",
+            "get_cbam_details.organisation_details.0.address_2",
+            "get_cbam_details.organisation_details.0.address_3"
+          ]
+        },
+        {
+          "cells": ["C6"],
+          "data_path": "get_cbam_details.organisation_details.0.city"
+        },
+        {
+          "cells": ["C7"],
+          "data_path": "get_cbam_details.organisation_details.0.state"
+        },
+        {
+          "cells": ["C8"],
+          "data_path": "get_cbam_details.organisation_details.0.country"
+        },
+        {
+          "cells": ["C9"],
+          "data_path": "get_cbam_details.organisation_details.0.pin_code"
+        },
+        {
+          "cells": ["C10"],
+          "data_path": "get_cbam_details.organisation_details.0.contact_number"
+        },
+        {
+          "cells": ["F3"],
+          "data_path": "get_cbam_details.organisation_details.0.reporting_period_start"
+        },
+        {
+          "cells": ["F4"],
+          "data_path": "get_cbam_details.organisation_details.0.reporting_period_end"
+        },
+        {
+          "cells": ["B14", "C21", "C29", "C39"],
+          "data_path": "get_cbam_details.product_details.0.aggregated_goods_category"
+        },
+        {
+          "cells": ["B21", "B49"],
+          "data_path": "get_cbam_details.product_details.0.primary_reducing_substance"
+        },
+        {
+          "cells": ["E39", "C49"],
+          "data_path": "get_cbam_details.see_calculations.0.direct_emission_scope_1"
+        },
+        {
+          "cells": ["G39", "D49"],
+          "data_path": "get_cbam_details.see_calculations.0.indirect_emission_scope_2"
+        },
+        {
+          "cells": ["E49", "H39"],
+          "data_path": "get_cbam_details.scope2_emissions.0.quantity_consumed"
+        }
+      ]
+    },
+    {
+      "name": "Summary products",
+      "mappings": [
+        {
+          "cells": ["B4"],
+          "data_path": "get_cbam_details.product_details.0.aggregated_goods_category"
+        },
+        {
+          "cells": ["C4"],
+          "data_path": "get_cbam_details.see_calculations.0.cn_code"
+        },
+        {
+          "cells": ["D4"],
+          "data_path": "get_cbam_details.product_details.0.product_name"
+        },
+        {
+          "cells": ["E4"],
+          "data_path": "get_cbam_details.see_calculations.0.direct_emission_scope_1"
+        },
+        {
+          "cells": ["F4"],
+          "data_path": "get_cbam_details.see_calculations.0.indirect_emission_scope_2"
+        },
+        {
+          "cells": ["I4"],
+          "data_path": "get_cbam_details.product_details.0.primary_reducing_substance"
+        }
+      ]
+    },
+    {
+      "name": "Summary Communication",
+      "mappings": [
+        {
+          "cells": ["C5"],
+          "data_path": "get_cbam_details.organisation_details.0.organization_name"
+        },
+        {
+          "cells": ["C6"],
+          "data_path": ["get_cbam_details.organisation_details.0.address_1",
+                        "get_cbam_details.organisation_details.0.address_2",
+                        "get_cbam_details.organisation_details.0.address_3"
+          ]
+        },
+        {
+          "cells": ["C7"],
+          "data_path": "get_cbam_details.organisation_details.0.city"
+        },
+        {
+          "cells": ["C8"],
+          "data_path": "get_cbam_details.organisation_details.0.state"
+        },
+        {
+          "cells": ["C9"],
+          "data_path": "get_cbam_details.organisation_details.0.country"
+        },
+        {
+          "cells": ["C10"],
+          "data_path": "get_cbam_details.organisation_details.0.pin_code"
+        },
+        {
+          "cells": ["C11"],
+          "data_path": "get_cbam_details.organisation_details.0.contact_number"
+        },
+        {
+          "cells": ["E7","L7","B16"],
+          "data_path": "get_cbam_details.product_details.0.aggregated_goods_category"
+        },
+        {
+          "cells": ["K7","I16"],
+          "data_path": "get_cbam_details.aggregated_goods_category.0.primary_reducing_substance"
+        },
+        {
+          "cells": ["C16"],
+          "data_path": "get_cbam_details.see_calculations.0.cn_code"
+        },
+        {
+          "cells": ["D16"],
+          "data_path": "get_cbam_details.product_details.0.product_name"
+        },
+        { "cells": ["E16","V6"],
+          "data_path": "get_cbam_details.see_calculations.0.direct_emission_scope_1"
+        },
+        {
+          "cells": ["F16","V7"],
+          "data_path": "get_cbam_details.see_calculations.0.indirect_emission_scope_2"
+        }
+      ]
+    }
+  ]
+}

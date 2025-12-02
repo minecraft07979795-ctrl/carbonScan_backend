@@ -1,0 +1,45 @@
+{
+  "name": "reput-carbon-api",
+  "version": "1.0.0",
+  "description": "RePut-Carbon-API",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "prod": "npx cross-env NODE_ENV=production node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.859.0",
+    "@types/crypto-js": "^4.2.2",
+    "aws-sdk": "^2.1692.0",
+    "bcrypt": "^6.0.0",
+    "body-parser": "^1.20.3",
+    "cloudinary": "^2.8.0",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.2.0",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^17.2.1",
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "joi": "^18.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "mssql": "^11.0.1",
+    "multer": "^2.0.2",
+    "multer-s3": "^3.0.1",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^6.10.0",
+    "nodemon": "^3.1.9",
+    "openai": "^5.12.0",
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^1.1.1",
+    "pg": "^8.16.0",
+    "tesseract.js": "^6.0.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "cross-env": "^10.0.0"
+  }
+}
