@@ -8,7 +8,8 @@ class Utility {
   constructor() {
     this.express = require('express');
     this.app = this.express();
-    this.port = process.env.PORT || 5000;
+    // this.port = process.env.PORT ||  5000;
+    this.port = process.env.PORT || 8080;
     this.cors = require('cors');
     this.fs = require('fs');
     const { randomUUID } = require('crypto');
