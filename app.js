@@ -11,6 +11,9 @@ const upload = require('./middlewares/upload.js');
 const _templates = require('./modules/templates.js');
 // const _anomalyFlags = require('./modules/anomalyFlags.js');
 
+const dotenv = require("dotenv");
+dotenv.config();  // Only this, no custom path
+
 const cors = require('cors');
 
 const utility = new _utility();
@@ -31,6 +34,9 @@ utility.app.use(compression());
 const helmet = require('helmet');
 utility.app.use(helmet());
 const bodyParser = require('body-parser');
+
+// const dotenv = require('dotenv');
+
 
 
 utility.app.use(utility.express.json())
@@ -57,14 +63,13 @@ utility.app.use(cors({
 
 
 
-const dotenv = require('dotenv');
 
 
-if (process.env.NODE_ENV === 'production') {
-  dotenv.config({ path: '.env.production' });
-} else {
-  dotenv.config({ path: '.env.local' });
-}
+// if (process.env.NODE_ENV === 'production') {
+//   dotenv.config({ path: '.env.production' });
+// } else {
+//   dotenv.config({ path: '.env.local' });
+// }
 
 
 
@@ -3438,7 +3443,8 @@ utility.app.get('/', (req, res) => {
   res.send("Hello I am working");
 })
 
-utility.app.listen(utility.port, () => {
+// utility.app.listen(utility.port, () => {
+utility.app.listen(utility.port, "0.0.0.0", () => {
   console.log(`Example app listening on port ${utility.port}`)
 })
 
