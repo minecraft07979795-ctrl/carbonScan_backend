@@ -1,5 +1,12 @@
 
 const dotenv = require('dotenv');
+     if (process.env.NODE_ENV === 'production') {
+       dotenv.config({ path: '.env.production' });
+     } else {
+       dotenv.config({ path: '.env.local' });
+     }
+
+     
 class Utility {
 
 
@@ -30,11 +37,6 @@ class Utility {
     this.AWS = require("aws-sdk");  // Amazon Web Services SDK for cloud services 
 
     
-     if (process.env.NODE_ENV === 'production') {
-       dotenv.config({ path: '.env.production' });
-     } else {
-       dotenv.config({ path: '.env.local' });
-     }
 
     this.secretAccessKey = process.env.SECRET_ACCESS_KEY;  // AWS secret key
     this.accessKeyId = process.env.ACCESS_KEY_ID;  // AWS access key
