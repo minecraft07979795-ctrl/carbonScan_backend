@@ -3467,9 +3467,9 @@ function drawCountryTableWithHeader(
 // })
 
 // utility.app.listen(utility.port, () => {
-utility.app.listen(utility.port, "0.0.0.0", () => {
-  console.log(`Example app listening on port ${utility.port}`)
-})
+// utility.app.listen(utility.port, "0.0.0.0", () => {
+//   console.log(`Example app listening on port ${utility.port}`)
+// })
 
 
 
@@ -3482,3 +3482,32 @@ utility.app.listen(utility.port, "0.0.0.0", () => {
 //   });
 // })
 
+
+
+
+
+
+
+
+
+
+const server = utility.app.listen(utility.port, "0.0.0.0", () => {
+  console.log(`🚀 Server started successfully`);
+  console.log(`📡 Listening on: http://0.0.0.0:${utility.port}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`⏰ Started at: ${new Date().toISOString()}`);
+});
+
+server.on('error', (err) => {
+  console.error('❌ Server failed to start:', err);
+  process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('📴 SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('✅ Server closed');
+    process.exit(0);
+  });
+});
