@@ -63,6 +63,29 @@ utility.app.use(cors({
 
 
 
+// ============= ROUTES (ALL BEFORE app.listen!) =============
+
+// Root & Health routes
+utility.app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Reput Carbon API is running',
+    version: '1.0.0',
+    timestamp: new Date().toISOString()
+  });
+});
+
+utility.app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    message: 'Server is running',
+    database: 'connected',
+    timestamp: new Date().toISOString()
+  });
+});
+
+
+
 
 
 // if (process.env.NODE_ENV === 'production') {
@@ -3439,9 +3462,9 @@ function drawCountryTableWithHeader(
 
 
 
-utility.app.get('/', (req, res) => {
-  res.send("Hello I am working");
-})
+// utility.app.get('/', (req, res) => {
+//   res.send("Hello I am working");
+// })
 
 // utility.app.listen(utility.port, () => {
 utility.app.listen(utility.port, "0.0.0.0", () => {
@@ -3450,12 +3473,12 @@ utility.app.listen(utility.port, "0.0.0.0", () => {
 
 
 
-// Add health check endpoint
-utility.app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'ok', 
-    message: 'Server is running',
-    timestamp: new Date().toISOString()
-  });
-})
+// // Add health check endpoint
+// utility.app.get('/health', (req, res) => {
+//   res.status(200).json({ 
+//     status: 'ok', 
+//     message: 'Server is running',
+//     timestamp: new Date().toISOString()
+//   });
+// })
 

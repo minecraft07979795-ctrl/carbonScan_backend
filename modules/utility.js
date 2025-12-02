@@ -160,7 +160,8 @@ class Utility {
       },
 
       send: function (res,obj){
-        if(!res._headerSent)
+        // if(!res._headerSent)
+        if(!res.headerSent)
         {
           res.send(obj);
         }else{
