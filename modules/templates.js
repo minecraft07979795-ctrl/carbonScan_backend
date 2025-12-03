@@ -1565,51 +1565,113 @@ class Templates {
 
 
 
+  // upsert_activity_data_batch = async (req, res) => {
+  //   try {
+
+  //     const { p_project_id, p_user_id, p_data_batch } = req.body
+
+  //     const query = {
+  //       text: 'SELECT * FROM   upsert_activity_data_batch($1,$2,$3)',
+  //       values: [p_project_id, p_user_id, p_data_batch]
+  //     };
+
+  //     const result = await this.utility.sql.query(query);
+
+  //     if (!result.rows) {
+  //       return this.utility.response.init(res, false, "No response from database", {
+  //         error: "DATABASE_ERROR"
+  //       }, 500);
+  //     }
+
+  //     return this.utility.response.init(
+  //       res,
+  //       true,
+  //       " commit_staged_changes_to_project successfully",
+  //       {
+  //         templates: result.rows,
+  //         count: result.rows.length
+  //       }
+  //     );
+
+  //   } catch (error) {
+  //     console.error('Error fetching templates:', error);
+  //     return this.utility.response.init(
+  //       res,
+  //       false,
+  //       "Internal server error while fetching templates",
+  //       {
+  //         error: "INTERNAL_SERVER_ERROR",
+  //         details: error.message
+  //       },
+  //       500
+  //     );
+  //   }
+  // };
+
+
+
+
+
   upsert_activity_data_batch = async (req, res) => {
-    try {
+  try {
+    let { p_project_id, p_user_id, p_data_batch } = req.body;
 
-      const { p_project_id, p_user_id, p_data_batch } = req.body
-
-      const query = {
-        text: 'SELECT * FROM   upsert_activity_data_batch($1,$2,$3)',
-        values: [p_project_id, p_user_id, p_data_batch]
-      };
-
-      const result = await this.utility.sql.query(query);
-
-      if (!result.rows) {
-        return this.utility.response.init(res, false, "No response from database", {
-          error: "DATABASE_ERROR"
-        }, 500);
+    // 🔥 If frontend accidentally sends string → convert to JSON
+    if (typeof p_data_batch === "string") {
+      try {
+        p_data_batch = JSON.parse(p_data_batch);
+      } catch (err) {
+        return this.utility.response.init(
+          res,
+          false,
+          "Invalid JSON format in p_data_batch",
+          { error: "INVALID_JSON" },
+          400
+        );
       }
+    }
 
-      return this.utility.response.init(
-        res,
-        true,
-        " commit_staged_changes_to_project successfully",
-        {
-          templates: result.rows,
-          count: result.rows.length
-        }
-      );
+    const query = {
+      text: "SELECT * FROM upsert_activity_data_batch($1, $2, $3::jsonb)",
+      values: [p_project_id, p_user_id, p_data_batch]   // <-- JSON object, not string
+    };
 
-    } catch (error) {
-      console.error('Error fetching templates:', error);
+    const result = await this.utility.sql.query(query);
+
+    if (!result?.rows) {
       return this.utility.response.init(
         res,
         false,
-        "Internal server error while fetching templates",
-        {
-          error: "INTERNAL_SERVER_ERROR",
-          details: error.message
-        },
+        "No response from database",
+        { error: "DATABASE_ERROR" },
         500
       );
     }
-  };
 
+    return this.utility.response.init(
+      res,
+      true,
+      "Batch data inserted successfully",
+      {
+        data: result.rows,
+        count: result.rows.length
+      }
+    );
 
-
+  } catch (error) {
+    console.error("Error in upsert_activity_data_batch:", error);
+    return this.utility.response.init(
+      res,
+      false,
+      "Internal server error",
+      {
+        error: "INTERNAL_SERVER_ERROR",
+        details: error.message
+      },
+      500
+    );
+  }
+};
 
 
 
