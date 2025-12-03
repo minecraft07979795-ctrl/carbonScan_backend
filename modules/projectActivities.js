@@ -1051,7 +1051,7 @@ class ProjectActivities {
       }
 
       const query = {
-        text: 'SELECT upsert_activity_data_batch($1, $2, $3) as result',
+        text: 'SELECT upsert_activity_data_batch($1, $2, $3::jsonb) as result',
         values: [project_id, user_id, JSON.stringify(data_batch)]
       };
 
