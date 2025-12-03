@@ -1,10 +1,10 @@
 
-// const dotenv = require('dotenv');
-//      if (process.env.NODE_ENV === 'production') {
-//        dotenv.config({ path: '.env.production' });
-//      } else {
-//        dotenv.config({ path: '.env.local' });
-//      }
+const dotenv = require('dotenv');
+     if (process.env.NODE_ENV === 'production') {
+       dotenv.config({ path: '.env.production' });
+     } else {
+       dotenv.config({ path: '.env.local' });
+     }
 
      
 class Utility {
@@ -120,6 +120,7 @@ class Utility {
       ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
 
     };
+
 
     this.sql = new Pool(pgConfig);
 
