@@ -1615,25 +1615,17 @@ class Templates {
   upsert_activity_data_batch = async (req, res) => {
   try {
     let { p_project_id, p_user_id, p_data_batch } = req.body;
-
-    // 🔥 If frontend accidentally sends string → convert to JSON
-    if (typeof p_data_batch === "string") {
-      try {
-        p_data_batch = JSON.parse(p_data_batch);
-      } catch (err) {
-        return this.utility.response.init(
-          res,
-          false,
-          "Invalid JSON format in p_data_batch",
-          { error: "INVALID_JSON" },
-          400
-        );
+  
+      if (!Array.isArray(p_data_batch) || p_data_batch.length === 0) {
+        return this.utility.response.init(res, false, "Data batch cannot be empty", {
+          error: "INVALID_INPUT"
+        }, 400);
       }
-    }
+      
 
     const query = {
       text: "SELECT * FROM upsert_activity_data_batch($1, $2, $3::jsonb)",
-      values: [p_project_id, p_user_id, p_data_batch]   // <-- JSON object, not string
+      values: [p_project_id, p_user_id, JSON.stringify(p_data_batch)]   // <-- JSON object, not string
     };
 
     const result = await this.utility.sql.query(query);
