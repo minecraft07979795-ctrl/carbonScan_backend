@@ -54,7 +54,7 @@ utility.app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 // }));
 
 utility.app.use(cors({
-  origin: [process.env.FRONTEND_URL, "http://localhost:3000","https://frontend-project-ab.vercel.app/login"],
+  origin: [process.env.FRONTEND_URL, "http://localhost:3000","https://frontend-project-ab.vercel.app"],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
