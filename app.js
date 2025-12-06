@@ -698,6 +698,10 @@ utility.app.post('/project/create',
   templates.CreateProject
 );
 
+utility.app.post('/get_project_category_monthly_carbon',
+  templates.get_project_category_monthly_carbon
+);
+
 
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
@@ -1869,7 +1873,46 @@ const detailedEmissions = [
   {
     label: "d. Indirect Emissions from Purchased/Acquired Cooling",
     value: data.cooling || ""
-  }
+  }, 
+  // {
+  //   label: "Scope 3: Other Indirect Emissions (15 Categories)",
+  //   value: "",
+  //   subHeader: true
+  // },
+
+  // {
+  //   label: "1. Purchased Goods and Services",
+  //   value: data.purchased_goods_services || ""
+  // },
+  // {
+  //   label: "2. Capital Goods",
+  //   value: data.capital_goods || ""
+  // },
+  // {
+  //   label: "3. Fuel- and Energy-Related Activities (not included in Scope 1 or 2)",
+  //   value: data.fuel_energy_related || ""
+  // },
+  // {
+  //   label: "4. Upstream Transportation and Distribution",
+  //   value: data.upstream_transport_distribution || ""
+  // },
+  // {
+  //   label: "5. Waste Generated in Operations",
+  //   value: data.waste_generated || ""
+  // },
+  // {
+  //   label: "6. Business Travel",
+  //   value: data.business_travel || ""
+  // },
+  // {
+  //   label: "7. Employee Commuting",
+  //   value: data.employee_commuting || ""
+  // },
+  // {
+  //   label: "8. Upstream Leased Assets",
+  //   value: data.upstream_leased_assets || ""
+  // }, 
+
 ];
 
 drawDetailedEmissionsTable(
@@ -1882,6 +1925,107 @@ drawDetailedEmissionsTable(
   fontBold,
   lightBlue
 );
+
+
+
+// Continue on page 4a (new page for remaining Scope 3 categories)
+const page4a = pdfDoc.addPage([595, 842]);
+y = 760;
+
+page4a.drawText("INFORMATION ON EMISSIONS (Continued)", {
+  x: 50,
+  y,
+  size: 14,
+  font: fontBold
+});
+
+y -= 35;
+
+const detailedEmissionsScope3Continued = [
+  // {
+  //   label: "Scope 3: Other Indirect Emissions (Continued)",
+  //   value: "",
+  //   subHeader: true
+  // },
+    {
+    label: "Scope 3: Other Indirect Emissions (15 Categories)",
+    value: "",
+    subHeader: true
+  },
+
+  {
+    label: "1. Purchased Goods and Services",
+    value: data.purchased_goods_services || ""
+  },
+  {
+    label: "2. Capital Goods",
+    value: data.capital_goods || ""
+  },
+  {
+    label: "3. Fuel- and Energy-Related Activities (not included in Scope 1 or 2)",
+    value: data.fuel_energy_related || ""
+  },
+    {
+    label: "4. Upstream Transportation and Distribution",
+    value: data.upstream_transport_distribution || ""
+  },
+  {
+    label: "5. Waste Generated in Operations",
+    value: data.waste_generated || ""
+  },
+  {
+    label: "6. Business Travel",
+    value: data.business_travel || ""
+  },
+  {
+    label: "7. Employee Commuting",
+    value: data.employee_commuting || ""
+  },
+  {
+    label: "8. Upstream Leased Assets",
+    value: data.upstream_leased_assets || ""
+  }, 
+  {
+    label: "9. Downstream Transportation and Distribution",
+    value: data.downstream_transport_distribution || ""
+  },
+  {
+    label: "10. Processing of Sold Products",
+    value: data.processing_sold_products || ""
+  },
+  {
+    label: "11. Use of Sold Products",
+    value: data.use_sold_products || ""
+  },
+  {
+    label: "12. End-of-Life Treatment of Sold Products",
+    value: data.end_of_life_sold_products || ""
+  },
+  {
+    label: "13. Downstream Leased Assets",
+    value: data.downstream_leased_assets || ""
+  },
+  {
+    label: "14. Franchises",
+    value: data.franchises || ""
+  },
+  {
+    label: "15. Investments",
+    value: data.investments || ""
+  }
+];
+
+drawDetailedEmissionsTable(
+  page4a,
+  50,
+  y,
+  495,
+  detailedEmissionsScope3Continued,
+  font,
+  fontBold,
+  lightBlue
+);
+
 
     // ============================================
     // PAGE 5: FURTHER EMISSIONS INFORMATION
