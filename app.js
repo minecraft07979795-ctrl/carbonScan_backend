@@ -1584,18 +1584,19 @@ utility.app.post("/generate_pdf", async (req, res) => {
           label: "6. Business Travel",
           value: data.business_travel
         });
-        if (data.employee_commuting) detailedEmissions.push({
-          label: "7. Employee Commuting",
-          value: data.employee_commuting
-        });
-        if (data.upstream_leased_assets) detailedEmissions.push({
-          label: "8. Upstream Leased Assets",
-          value: data.upstream_leased_assets
-        });
+        // if (data.employee_commuting) detailedEmissions.push({
+        //   label: "7. Employee Commuting",
+        //   value: data.employee_commuting
+        // });
+        // if (data.upstream_leased_assets) detailedEmissions.push({
+        //   label: "8. Upstream Leased Assets",
+        //   value: data.upstream_leased_assets
+        // });
       }
 
       // Check if we need to split across pages (more than 25 rows)
-      if (detailedEmissions.length <= 25) {
+      if (detailedEmissions.length <= 2) {
+      // if (detailedEmissions.length <= 25) {
         drawDetailedEmissionsTable(
           page4,
           50,
@@ -1638,6 +1639,15 @@ utility.app.post("/generate_pdf", async (req, res) => {
             subHeader: true
           }
         ];
+
+        if (data.employee_commuting) remainingEmissions.push({
+          label: "7. Employee Commuting",
+          value: data.employee_commuting
+        });
+        if (data.upstream_leased_assets) remainingEmissions.push({
+          label: "8. Upstream Leased Assets",
+          value: data.upstream_leased_assets
+        });
 
         if (data.downstream_transport_distribution) remainingEmissions.push({
           label: "9. Downstream Transportation and Distribution",
