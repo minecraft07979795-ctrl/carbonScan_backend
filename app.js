@@ -702,6 +702,10 @@ utility.app.post('/get_project_category_monthly_carbon',
   templates.get_project_category_monthly_carbon
 );
 
+utility.app.post('/get_project_category_scope_totals',
+  templates.get_project_category_scope_totals
+);
+
 
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
@@ -848,277 +852,6 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 
 
 
-
-
-//old formate
-
-// const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
-
-// utility.app.post("/generate_pdf", async (req, res) => {
-//   try {
-//     const body = req.body && Object.keys(req.body).length ? req.body : {};
-
-//     // No defaults - use only what's sent in the request
-//     const payload = {
-//       reportingPeriod: body.reportingPeriod,
-//       criteria: body.criteria,
-//       otherSources: body.otherSources,
-//       rows: body.rows || []
-//     };
-
-//     const pdfDoc = await PDFDocument.create();
-//     const page = pdfDoc.addPage([842, 595]);
-//     const { width, height } = page.getSize();
-
-//     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-//     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-//     // ============================
-//     // WATERMARK - "bsi." in center
-//     // ============================
-//     // const watermarkText = "bsi.";
-//     const watermarkText = "verified";
-//     const watermarkSize = 180;
-//     const watermarkX = width / 2 - 100;
-//     const watermarkY = height / 2 - 50;
-
-//     page.drawText(watermarkText, {
-//       x: watermarkX,
-//       y: watermarkY,
-//       size: watermarkSize,
-//       font: fontBold,
-//       color: rgb(0.85, 0.85, 0.85),
-//       opacity: 0.3,
-//     });
-
-//     // ============================
-//     // HEADER "bsi."
-//     // ============================
-//     // page.drawText("bsi", {
-//     page.drawText("carbon scan.ai", {
-//       x: 40,
-//       y: 545,
-//       size: 44,
-//       font: fontBold,
-//       color: rgb(0, 0, 0),
-//     });
-
-//     // Draw the red dot after "bsi"
-//     page.drawCircle({
-//       // x: 125,
-//       x: 350,
-//       y: 551,
-//       size: 4,
-//       color: rgb(0.9, 0.1, 0.1),
-//     });
-
-//     // ============================
-//     // TOP INFO TABLE (Dynamic rows based on what's provided)
-//     // ============================
-//     const topTableX = 105;
-//     const topTableY = 500;
-//     const topTableWidth = width - 145;
-//     const topRowHeight = 26;
-
-//     // Build table data only from provided fields
-//     const topTableData = [];
-
-//     if (payload.otherSources !== undefined && payload.otherSources !== null) {
-//       topTableData.push(["Indirect GHG emissions from\nother sources", payload.otherSources]);
-//     }
-
-//     if (payload.criteria !== undefined && payload.criteria !== null) {
-//       topTableData.push(["Criteria for developing the organizational\nGHG Inventory:", payload.criteria]);
-//     }
-
-//     if (payload.reportingPeriod !== undefined && payload.reportingPeriod !== null) {
-//       topTableData.push(["Reporting Period", payload.reportingPeriod]);
-//     }
-
-//     // Only draw top table if there's data
-//     if (topTableData.length > 0) {
-//       // Draw outer rectangle
-//       page.drawRectangle({
-//         x: topTableX,
-//         y: topTableY - topRowHeight * topTableData.length,
-//         width: topTableWidth,
-//         height: topRowHeight * topTableData.length,
-//         borderWidth: 1,
-//         borderColor: rgb(0, 0, 0),
-//       });
-
-//       // Draw horizontal lines
-//       for (let i = 1; i < topTableData.length; i++) {
-//         page.drawLine({
-//           start: { x: topTableX, y: topTableY - topRowHeight * i },
-//           end: { x: topTableX + topTableWidth, y: topTableY - topRowHeight * i },
-//           thickness: 1,
-//           color: rgb(0, 0, 0),
-//         });
-//       }
-
-//       // Draw vertical line separating columns
-//       const topColSplit = topTableX + topTableWidth * 0.45;
-//       page.drawLine({
-//         start: { x: topColSplit, y: topTableY },
-//         end: { x: topColSplit, y: topTableY - topRowHeight * topTableData.length },
-//         thickness: 1,
-//         color: rgb(0, 0, 0),
-//       });
-
-//       // Draw content
-//       for (let i = 0; i < topTableData.length; i++) {
-//         const yPos = topTableY - topRowHeight * i - 17;
-
-//         // Left column text
-//         const leftLines = topTableData[i][0].split('\n');
-//         leftLines.forEach((line, idx) => {
-//           page.drawText(line, {
-//             x: topTableX + 8,
-//             y: yPos + (leftLines.length > 1 ? 6 - idx * 10 : 0),
-//             size: 12,
-//             font,
-//             color: rgb(0, 0, 0),
-//           });
-//         });
-
-//         // Right column text
-//         page.drawText(String(topTableData[i][1]), {
-//           x: topColSplit + 8,
-//           y: yPos,
-//           size: 12,
-//           font,
-//           color: rgb(0, 0, 0),
-//         });
-//       }
-//     }
-
-//     // ============================
-//     // MAIN EMISSIONS TABLE (Only if rows exist)
-//     // ============================
-//     if (payload.rows.length > 0) {
-//       const mainTableX = 105;
-//       const startTableY = 410;
-//       let mainTableY = startTableY;
-//       const mainTableWidth = topTableWidth;
-//       const mainRowHeight = 18.5;
-//       const labelColWidth = mainTableWidth * 0.72;
-//       const valueColX = mainTableX + labelColWidth;
-
-//       // Draw outer border
-//       const tableStartY = mainTableY;
-//       const totalRows = payload.rows.length + 1; // +1 for header
-
-//       page.drawRectangle({
-//         x: mainTableX,
-//         y: mainTableY - mainRowHeight * totalRows,
-//         width: mainTableWidth,
-//         height: mainRowHeight * totalRows,
-//         borderWidth: 1,
-//         borderColor: rgb(0, 0, 0),
-//       });
-
-//       // Draw vertical line separating columns
-//       page.drawLine({
-//         start: { x: valueColX, y: tableStartY },
-//         end: { x: valueColX, y: mainTableY - mainRowHeight * totalRows },
-//         thickness: 1,
-//         color: rgb(0, 0, 0),
-//       });
-
-//       // Draw header row
-//       page.drawLine({
-//         start: { x: mainTableX, y: mainTableY },
-//         end: { x: mainTableX + mainTableWidth, y: mainTableY },
-//         thickness: 1,
-//         color: rgb(0, 0, 0),
-//       });
-
-//       page.drawText("tCO2e", {
-//         x: valueColX + 10,
-//         y: mainTableY - 15,
-//         size: 12,
-//         font: fontBold,
-//       });
-
-//       mainTableY -= mainRowHeight;
-
-//       // Draw all data rows
-//       for (let i = 0; i < payload.rows.length; i++) {
-//         const row = payload.rows[i];
-
-//         // Draw gray background for header rows (before borders)
-//         if (row.grayBg) {
-//           page.drawRectangle({
-//             x: mainTableX,
-//             y: mainTableY - mainRowHeight,
-//             width: mainTableWidth,
-//             height: mainRowHeight,
-//             color: rgb(0.75, 0.75, 0.75),
-//           });
-//         }
-
-//         // Draw horizontal line
-//         page.drawLine({
-//           start: { x: mainTableX, y: mainTableY },
-//           end: { x: mainTableX + mainTableWidth, y: mainTableY },
-//           thickness: 0.5,
-//           color: rgb(0, 0, 0),
-//         });
-
-//         // Only bold for rows where bold: true
-//         const useBold = row.bold === true;
-//         const useFont = useBold ? fontBold : font;
-
-//         // Draw label
-//         page.drawText(String(row.label), {
-//           x: mainTableX + 6,
-//           y: mainTableY - 14,
-//           size: 12,
-//           font: useFont,
-//         });
-
-//         // Draw value (only if not empty)
-//         if (row.value !== "" && row.value !== null && row.value !== undefined) {
-//           const formattedValue = Number(row.value).toLocaleString("en-US", {
-//             minimumFractionDigits: 1,
-//             maximumFractionDigits: 1,
-//           });
-
-//           page.drawText(formattedValue, {
-//             x: valueColX + 10,
-//             y: mainTableY - 14,
-//             size: 9,
-//             font: useFont,
-//           });
-//         }
-
-//         mainTableY -= mainRowHeight;
-//       }
-//     }
-
-//     const pdfBytes = await pdfDoc.save();
-
-//     // Generate filename with timestamp
-//     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-//     const filename = `GHG-Emissions-Report-${timestamp}.pdf`;
-
-//     res.setHeader("Content-Type", "application/pdf");
-//     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-//     res.setHeader("Content-Length", pdfBytes.length);
-
-//     res.send(Buffer.from(pdfBytes));
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ error: "PDF generation failed", detail: err.message });
-//   }
-// });
-
-
-
-
- 
-
  
  
 
@@ -1131,13 +864,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 
 
 
-
-
- 
-
-
-
- 
+// _________________________________________________________________________
 
 
 const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
@@ -1152,279 +879,216 @@ utility.app.post("/generate_pdf", async (req, res) => {
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
     // Light blue color for table headers
-    const lightBlue = rgb(0.678, 0.847, 0.902); // Light blue #ADD8E6
+    const lightBlue = rgb(0.678, 0.847, 0.902);
     const black = rgb(0, 0, 0);
     const white = rgb(1, 1, 1);
 
     // ============================================
     // PAGE 1: TITLE PAGE
     // ============================================
-    const page1 = pdfDoc.addPage([595, 842]); // A4 portrait
+    const page1 = pdfDoc.addPage([595, 842]);
     let y = 760;
 
-// Title - Centered
-const title = "Greenhouse Gas Emissions Inventory";
-const titleWidth = fontBold.widthOfTextAtSize(title, 18);
-page1.drawText(title, {
-  x: (595 - titleWidth) / 2, // Center horizontally
-  y,
-  size: 18,
-  font: fontBold,
-  color: black
-});
-
+    // Title - Centered (always show)
+    const title = "Greenhouse Gas Emissions Inventory";
+    const titleWidth = fontBold.widthOfTextAtSize(title, 18);
+    page1.drawText(title, {
+      x: (595 - titleWidth) / 2,
+      y,
+      size: 18,
+      font: fontBold,
+      color: black
+    });
     y -= 40;
-// Company Name - Centered
-const companyName = data.companyName || "[COMPANY NAME]";
-const companyWidth = fontBold.widthOfTextAtSize(companyName, 14);
-page1.drawText(companyName, {
-  x: (595 - companyWidth) / 2, // Center horizontally
-  y,
-  size: 14,
-  font: fontBold,
-  color: black
-});
 
-    y -= 30;
-const inventoryYear = data.inventoryYear || "[INVENTORY YEAR]";
-const yearWidth = fontBold.widthOfTextAtSize(inventoryYear, 14);
-page1.drawText(inventoryYear, {
-  x: (595 - yearWidth) / 2, // Center horizontally
-  y,
-  size: 14,
-  font: fontBold,
-  color: black
-});
-
- 
-
-        
- // Company Logo Box with Image
-y -= 50;
-
-if (data.companyLogoUrl) {
-  try {
-    console.log("Fetching logo from:", data.companyLogoUrl);
-    
-    // Fetch the image
-    const response = await fetch(data.companyLogoUrl);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    // Company Name - Centered (only if provided)
+    if (data.companyName) {
+      const companyWidth = fontBold.widthOfTextAtSize(data.companyName, 14);
+      page1.drawText(data.companyName, {
+        x: (595 - companyWidth) / 2,
+        y,
+        size: 14,
+        font: fontBold,
+        color: black
+      });
+      y -= 30;
     }
-    
-    const arrayBuffer = await response.arrayBuffer();
-    const imageBytes = new Uint8Array(arrayBuffer);
-    
-    // Determine image type and embed
-    let logoImage;
-    const url = data.companyLogoUrl.toLowerCase();
-    
-    if (url.endsWith('.png') || url.includes('.png?') || url.includes('format=png')) {
-      logoImage = await pdfDoc.embedPng(imageBytes);
-    } else if (url.endsWith('.jpg') || url.endsWith('.jpeg') || 
-               url.includes('.jpg?') || url.includes('.jpeg?') ||
-               url.includes('format=jpg') || url.includes('format=jpeg')) {
-      logoImage = await pdfDoc.embedJpg(imageBytes);
+
+    // Inventory Year - Centered (only if provided)
+    if (data.inventoryYear) {
+      const yearWidth = fontBold.widthOfTextAtSize(data.inventoryYear, 14);
+      page1.drawText(data.inventoryYear, {
+        x: (595 - yearWidth) / 2,
+        y,
+        size: 14,
+        font: fontBold,
+        color: black
+      });
+      y -= 50;
     } else {
-      // Try PNG first, then JPG
+      y -= 30;
+    }
+
+    // Company Logo (only if provided)
+    if (data.companyLogoUrl) {
       try {
-        logoImage = await pdfDoc.embedPng(imageBytes);
-      } catch {
-        logoImage = await pdfDoc.embedJpg(imageBytes);
+        console.log("Fetching logo from:", data.companyLogoUrl);
+        const response = await fetch(data.companyLogoUrl);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch image: ${response.statusText}`);
+        }
+        
+        const arrayBuffer = await response.arrayBuffer();
+        const imageBytes = new Uint8Array(arrayBuffer);
+        
+        let logoImage;
+        const url = data.companyLogoUrl.toLowerCase();
+        
+        if (url.endsWith('.png') || url.includes('.png?') || url.includes('format=png')) {
+          logoImage = await pdfDoc.embedPng(imageBytes);
+        } else if (url.endsWith('.jpg') || url.endsWith('.jpeg') || 
+                   url.includes('.jpg?') || url.includes('.jpeg?') ||
+                   url.includes('format=jpg') || url.includes('format=jpeg')) {
+          logoImage = await pdfDoc.embedJpg(imageBytes);
+        } else {
+          try {
+            logoImage = await pdfDoc.embedPng(imageBytes);
+          } catch {
+            logoImage = await pdfDoc.embedJpg(imageBytes);
+          }
+        }
+
+        const boxWidth = 495;
+        const boxHeight = 80;
+        const imgDims = logoImage.scale(1);
+        
+        const scaleX = (boxWidth - 20) / imgDims.width;
+        const scaleY = (boxHeight - 20) / imgDims.height;
+        const scale = Math.min(scaleX, scaleY, 1);
+        
+        const scaledWidth = imgDims.width * scale;
+        const scaledHeight = imgDims.height * scale;
+        
+        const imgX = 50 + (boxWidth - scaledWidth) / 2;
+        const imgY = y - 80 + (boxHeight - scaledHeight) / 2;
+
+        page1.drawImage(logoImage, {
+          x: imgX,
+          y: imgY,
+          width: scaledWidth,
+          height: scaledHeight
+        });
+        
+        y -= 100;
+        console.log("Logo embedded successfully");
+      } catch (error) {
+        console.error("Error embedding logo:", error.message);
+        y -= 20;
       }
     }
 
-    // Calculate dimensions to fit in the box
-    const boxWidth = 495;
-    const boxHeight = 80;
-    const imgDims = logoImage.scale(1);
-    
-    // Calculate scaling to fit image in box while maintaining aspect ratio
-    const scaleX = (boxWidth - 20) / imgDims.width;
-    const scaleY = (boxHeight - 20) / imgDims.height;
-    const scale = Math.min(scaleX, scaleY, 1); // Don't upscale
-    
-    const scaledWidth = imgDims.width * scale;
-    const scaledHeight = imgDims.height * scale;
-    
-    // Center the image in the box
-    const imgX = 50 + (boxWidth - scaledWidth) / 2;
-    const imgY = y - 80 + (boxHeight - scaledHeight) / 2;
+    // Verification Section (only if verification status is provided)
+    if (data.verified !== undefined) {
+      y -= 20;
 
-    // NO BORDER - Just draw the logo directly
-    page1.drawImage(logoImage, {
-      x: imgX,
-      y: imgY,
-      width: scaledWidth,
-      height: scaledHeight
-    });
-    
-    console.log("Logo embedded successfully");
-  } catch (error) {
-    console.error("Error embedding logo:", error.message);
-    // Fallback to placeholder text WITH border if image fails
-    page1.drawRectangle({
-      x: 50,
-      y: y - 80,
-      width: 495,
-      height: 80,
-      borderWidth: 1,
-      borderColor: black
-    });
-    page1.drawText("COMPANY", {
-      x: 270,
-      y: y - 30,
-      size: 12,
-      font: fontBold
-    });
-    page1.drawText("LOGO", {
-      x: 280,
-      y: y - 50,
-      size: 12,
-      font: fontBold
-    });
-    page1.drawText("(Failed to load image)", {
-      x: 240,
-      y: y - 65,
-      size: 8,
-      font
-    });
-  }
-} else {
-  // No logo provided - show placeholder WITH border
-  page1.drawRectangle({
-    x: 50,
-    y: y - 80,
-    width: 495,
-    height: 80,
-    borderWidth: 1,
-    borderColor: black
-  });
-  page1.drawText("COMPANY", {
-    x: 270,
-    y: y - 30,
-    size: 12,
-    font: fontBold
-  });
-  page1.drawText("LOGO", {
-    x: 280,
-    y: y - 50,
-    size: 12,
-    font: fontBold
-  });
-}
+      // Table Header
+      page1.drawRectangle({
+        x: 50,
+        y: y - 30,
+        width: 495,
+        height: 30,
+        color: lightBlue,
+        borderWidth: 1,
+        borderColor: black
+      });
 
+      const verHeader = "Has this inventory been verified by an accredited third party?";
+      const hdrWidth = fontBold.widthOfTextAtSize(verHeader, 10);
+      page1.drawText(verHeader, {
+        x: 50 + (495 - hdrWidth) / 2,
+        y: y - 22,
+        size: 10,
+        font: fontBold
+      });
+      y -= 30;
 
-    // ============================================
-// Verification Table (Header + Yes/No inside)
-// ============================================
-y -= 120;
+      // Yes / No Options Row
+      const optionHeight = 25;
+      page1.drawRectangle({
+        x: 50,
+        y: y - optionHeight,
+        width: 495,
+        height: optionHeight,
+        borderWidth: 1,
+        borderColor: black
+      });
 
-// Table Header
-page1.drawRectangle({
-  x: 50,
-  y: y - 30,
-  width: 495,
-  height: 30,
-  color: lightBlue,
-  borderWidth: 1,
-  borderColor: black
-});
+      page1.drawText("[ ] No", { x: 70, y: y - 17, size: 10, font });
+      page1.drawText(
+        "[ ] Yes (if yes, fill verification information below)",
+        { x: 200, y: y - 17, size: 10, font }
+      );
 
-// Centered Header Text
-const verHeader = "Has this inventory been verified by an accredited third party?";
-const hdrWidth = fontBold.widthOfTextAtSize(verHeader, 10);
-page1.drawText(verHeader, {
-  x: 50 + (495 - hdrWidth) / 2,
-  y: y - 22,
-  size: 10,
-  font: fontBold
-});
-y -= 30;
+      y -= optionHeight + 15;
 
-// Yes / No Options Row (boxed)
-const optionHeight = 25;
-page1.drawRectangle({
-  x: 50,
-  y: y - optionHeight,
-  width: 495,
-  height: optionHeight,
-  borderWidth: 1,
-  borderColor: black
-});
+      // If YES → Show Verification Details Table
+      if (data.verified) {
+        const verificationRows = [];
+        if (data.verificationDate) verificationRows.push({ label: "Date of verification:", value: data.verificationDate });
+        if (data.verifier) verificationRows.push({ label: "Verifier:", value: data.verifier });
+        if (data.verifierEmail) verificationRows.push({ label: "Email:", value: data.verifierEmail });
+        if (data.verifierPhone) verificationRows.push({ label: "Phone:", value: data.verifierPhone });
+        if (data.verifierAddress) verificationRows.push({ label: "Address:", value: data.verifierAddress });
+        
+        if (verificationRows.length > 0) {
+          drawSimpleTable(page1, 50, y, 495, verificationRows, font, fontBold);
+          y -= verificationRows.length * 25 + 20;
+        }
+      } else {
+        y -= 20;
+      }
+    }
 
-// Draw choices
-page1.drawText(
-  data.verified ? "[ ] No" : "[ ] No",
-  { x: 70, y: y - 17, size: 10, font }
-);
+    // Exclusions (only if provided)
+    if (data.exclusions) {
+      y -= 20;
+      drawSingleRowTable(
+        page1,
+        50,
+        y,
+        495,
+        "Have any facilities, operations and/or emissions sources been excluded from this inventory? If yes, please specify.",
+        data.exclusions,
+        font,
+        fontBold,
+        lightBlue
+      );
+      y -= 80;
+    }
 
-page1.drawText(
-  data.verified
-    ? "[ ] Yes (if yes, fill verification information below)"
-    : "[ ] Yes (if yes, fill verification information below)",
-  { x: 200, y: y - 17, size: 10, font }
-);
-
-y -= optionHeight + 15;
-
-// If YES → Show Verification Details Table
-if (data.verified) {
-  const verificationRows = [
-    { label: "Date of verification:", value: data.verificationDate || "MM/DD/YYYY" },
-    { label: "Verifier:", value: data.verifier || "" },
-    { label: "Email:", value: data.verifierEmail || "" },
-    { label: "Phone:", value: data.verifierPhone || "" },
-    { label: "Address:", value: data.verifierAddress || "" }
-  ];
-  drawSimpleTable(page1, 50, y, 495, verificationRows, font, fontBold);
-  y -= verificationRows.length * 25 + 20;
-} else {
-  y -= 20;
-}
-
-
-
-
-
-
-    // Exclusions
- y -= 20;
-drawSingleRowTable(
-  page1,
-  50,
-  y,
-  495,
-  "Have any facilities, operations and/or emissions sources been excluded from this inventory? If yes, please specify.",
-  data.exclusions || "",
-  font,
-  fontBold,
-  lightBlue
-);
-
-    // Reporting Period
-    y -= 60;
-    const periodText = `From ${data.periodFrom || "MM/DD/YYYY"} to ${
-      data.periodTo || "MM/DD/YYYY"
-    }`;
-    drawTableWithBlueHeader(
-      page1,
-      50,
-      y,
-      495,
-      [
-        {
-          label: "Reporting period covered by this inventory",
-          value: "",
-          isHeader: true
-        },
-        { label: periodText, value: "", isData: true }
-      ],
-      font,
-      fontBold,
-      lightBlue
-    );
+    // Reporting Period (only if dates provided)
+    if (data.periodFrom || data.periodTo) {
+      y -= 20;
+      const periodText = `From ${data.periodFrom || "MM/DD/YYYY"} to ${data.periodTo || "MM/DD/YYYY"}`;
+      drawTableWithBlueHeader(
+        page1,
+        50,
+        y,
+        495,
+        [
+          {
+            label: "Reporting period covered by this inventory",
+            value: "",
+            isHeader: true
+          },
+          { label: periodText, value: "", isData: true }
+        ],
+        font,
+        fontBold,
+        lightBlue
+      );
+    }
 
     // ============================================
     // PAGE 2: ORGANIZATIONAL & OPERATIONAL BOUNDARIES
@@ -1432,96 +1096,70 @@ drawSingleRowTable(
     const page2 = pdfDoc.addPage([595, 842]);
     y = 760;
 
-    page2.drawText("ORGANIZATIONAL BOUNDARIES", {
-      x: 50,
-      y,
-      size: 14,
-      font: fontBold
-    });
+    // Organizational Boundaries Section (only if any consolidation approach is selected)
+    if (data.equityShare || data.financialControl || data.operationalControl) {
+      page2.drawText("ORGANIZATIONAL BOUNDARIES", {
+        x: 50,
+        y,
+        size: 14,
+        font: fontBold
+      });
 
-    y -= 40;
-    const consolidationText = [
-      "Which consolidation approach was chosen (check each consolidation approach",
-      "for which your company is reporting emissions.)",
-      "",
-      "If your company is reporting according to more than one consolidation approach,",
-      "please complete and attach an additional completed reporting template that",
-      "provides your company's emissions data following the other consolidation approach(es)."
-    ];
+      y -= 40;
+      const consolidationText = [
+        "Which consolidation approach was chosen (check each consolidation approach",
+        "for which your company is reporting emissions.)",
+        "",
+        "If your company is reporting according to more than one consolidation approach,",
+        "please complete and attach an additional completed reporting template that",
+        "provides your company's emissions data following the other consolidation approach(es)."
+      ];
 
-    // Calculate header height
-const headerHeight = consolidationText.length * 12 + 10;
+      const headerHeight = consolidationText.length * 12 + 10;
 
-// Draw blue header background
-page2.drawRectangle({
-  x: 50,
-  y: y - headerHeight,
-  width: 495,
-  height: headerHeight,
-  color: lightBlue,
-  borderWidth: 1,
-  borderColor: black
-});
+      page2.drawRectangle({
+        x: 50,
+        y: y - headerHeight,
+        width: 495,
+        height: headerHeight,
+        color: lightBlue,
+        borderWidth: 1,
+        borderColor: black
+      });
 
-// Draw header text
-consolidationText.forEach((line, idx) => {
-  page2.drawText(line, { 
-    x: 55, 
-    y: y - 15 - (idx * 12), 
-    size: 9, 
-    font: fontBold 
-  });
-});
+      consolidationText.forEach((line, idx) => {
+        page2.drawText(line, { 
+          x: 55, 
+          y: y - 15 - (idx * 12), 
+          size: 9, 
+          font: fontBold 
+        });
+      });
 
-y -= headerHeight;
+      y -= headerHeight;
 
-// Single row with all three checkboxes
-const checkboxRowHeight = 30;
-page2.drawRectangle({
-  x: 50,
-  y: y - checkboxRowHeight,
-  width: 495,
-  height: checkboxRowHeight,
-  borderWidth: 1,
-  borderColor: black
-});
+      const checkboxRowHeight = 30;
+      page2.drawRectangle({
+        x: 50,
+        y: y - checkboxRowHeight,
+        width: 495,
+        height: checkboxRowHeight,
+        borderWidth: 1,
+        borderColor: black
+      });
 
-// Draw all three options in one row
-const option1 = data.equityShare ? "[  ] Equity Share" : "[ ] Equity Share";
-const option2 = data.financialControl ? "[  ] Financial Control" : "[ ] Financial Control";
-const option3 = data.operationalControl ? "[  ] Operational Control" : "[ ] Operational Control";
+      const option1 = data.equityShare ? "[ ] Equity Share" : "[ ] Equity Share";
+      const option2 = data.financialControl ? "[ ] Financial Control" : "[ ] Financial Control";
+      const option3 = data.operationalControl ? "[ ] Operational Control" : "[ ] Operational Control";
 
-page2.drawText(option1, {
-  x: 70,
-  y: y - 20,
-  size: 10,
-  font
-});
+      page2.drawText(option1, { x: 70, y: y - 20, size: 10, font });
+      page2.drawText(option2, { x: 220, y: y - 20, size: 10, font });
+      page2.drawText(option3, { x: 390, y: y - 20, size: 10, font });
 
-page2.drawText(option2, {
-  x: 220,
-  y: y - 20,
-  size: 10,
-  font
-});
+      y -= checkboxRowHeight + 20;
+    }
 
-page2.drawText(option3, {
-  x: 390,
-  y: y - 20,
-  size: 10,
-  font
-});
-
-y -= checkboxRowHeight + 20;
-
-
-
-
-
- 
-  
-
-    // y -= 60;
+    // Operational Boundaries Section
     page2.drawText("OPERATIONAL BOUNDARIES", {
       x: 50,
       y,
@@ -1530,248 +1168,254 @@ y -= checkboxRowHeight + 20;
     });
 
     y -= 35;
-    drawTableWithBlueHeader(
-      page2,
-      50,
-      y,
-      495,
-      [
-        {
-          label: "Are Scope 3 emissions included in this inventory?",
-          value: "",
-          isHeader: true
-        },
-        {
-          label: data.scope3Included ? "[  ] yes  [ ] no" : "[ ] yes  [  ] no",
-          value: "",
-          isData: true
-        }
-      ],
-      font,
-      fontBold,
-      lightBlue
-    );
 
+    // Scope 3 included question (only if specified)
+    if (data.scope3Included !== undefined) {
+      drawTableWithBlueHeader(
+        page2,
+        50,
+        y,
+        495,
+        [
+          {
+            label: "Are Scope 3 emissions included in this inventory?",
+            value: "",
+            isHeader: true
+          },
+          {
+            label: data.scope3Included ? "[ ] yes  [ ] no" : "[ ] yes  [ ] no",
+            value: "",
+            isData: true
+          }
+        ],
+        font,
+        fontBold,
+        lightBlue
+      );
+      y -= 80;
+    }
+
+    // Scope 3 Activities (only if provided)
+    if (data.scope3Activities) {
+      const scope3HeaderHeight = 30;
+
+      page2.drawRectangle({
+        x: 50,
+        y: y - scope3HeaderHeight,
+        width: 495,
+        height: scope3HeaderHeight,
+        color: lightBlue,
+        borderWidth: 1,
+        borderColor: black
+      });
+
+      page2.drawText(
+        "If yes, which types of activities are included in Scope 3 emissions?",
+        {
+          x: 55,
+          y: y - 20,
+          size: 10,
+          font: fontBold,
+          maxWidth: 485
+        }
+      );
+
+      y -= scope3HeaderHeight;
+
+      const valueRowHeight = 50;
+      page2.drawRectangle({
+        x: 50,
+        y: y - valueRowHeight,
+        width: 495,
+        height: valueRowHeight,
+        borderWidth: 1,
+        borderColor: black
+      });
+
+      page2.drawText(String(data.scope3Activities), {
+        x: 55,
+        y: y - 15,
+        size: 9,
+        font,
+        maxWidth: 485
+      });
+
+      y -= valueRowHeight + 10;
+    }
+
+    // Main Emissions Table (only if any emissions data provided)
+    const hasEmissionsData = data.emissions && Object.keys(data.emissions).length > 0;
     
+    if (hasEmissionsData) {
+      y -= 80;
+      page2.drawText("INFORMATION ON EMISSIONS", {
+        x: 50,
+        y,
+        size: 14,
+        font: fontBold
+      });
+      y -= 20;
+      page2.drawText(
+        "The table below refers to emissions independent of any GHG trades such as",
+        { x: 50, y, size: 9, font }
+      );
+      y -= 12;
+      page2.drawText(
+        "sales, purchases, transfers, or banking of allowances",
+        { x: 50, y, size: 9, font }
+      );
 
+      y -= 25;
+      drawEmissionsTable(
+        page2,
+        50,
+        y,
+        495,
+        data.emissions || {},
+        font,
+        fontBold,
+        lightBlue
+      );
+      y -= 115;
+    }
 
-    // Replace this part in your OPERATIONAL BOUNDARIES section:
-
-y -= 80;
-
-// Single header with blue background (no two columns)
-const scope3HeaderHeight = 30;
-
-page2.drawRectangle({
-  x: 50,
-  y: y - scope3HeaderHeight,
-  width: 495,
-  height: scope3HeaderHeight,
-  color: lightBlue,
-  borderWidth: 1,
-  borderColor: black
-});
-
-page2.drawText(
-  "If yes, which types of activities are included in Scope 3 emissions?",
-  {
-    x: 55,
-    y: y - 20,
-    size: 10,
-    font: fontBold,
-    maxWidth: 485
-  }
-);
-
-y -= scope3HeaderHeight;
-
-// Value row beneath the header
-const valueRowHeight = 50;
-
-page2.drawRectangle({
-  x: 50,
-  y: y - valueRowHeight,
-  width: 495,
-  height: valueRowHeight,
-  borderWidth: 1,
-  borderColor: black
-});
-
-if (data.scope3Activities) {
-  page2.drawText(String(data.scope3Activities), {
-    x: 55,
-    y: y - 15,
-    size: 9,
-    font,
-    maxWidth: 485
-  });
-}
-
-y -= valueRowHeight + 10;
-
-
-
-    // Main Emissions Table
-    y -= 80;
-    page2.drawText("INFORMATION ON EMISSIONS", {
-      x: 50,
-      y,
-      size: 14,
-      font: fontBold
-    });
-    y -= 20;
-    page2.drawText(
-      "The table below refers to emissions independent of any GHG trades such as",
-      { x: 50, y, size: 9, font }
-    );
-    y -= 12;
-    page2.drawText(
-      "sales, purchases, transfers, or banking of allowances",
-      { x: 50, y, size: 9, font }
-    );
-
-    y -= 25;
-    drawEmissionsTable(
-      page2,
-      50,
-      y,
-      495,
-      data.emissions || {},
-      font,
-      fontBold,
-      lightBlue
-    );
-
-    y -= 115;
-    drawTableWithBlueHeader(
-      page2,
-      50,
-      y,
-      495,
-      [
-        {
-          label:
-            "Direct CO2 emissions from Biogenic combustion (mtCO2)",
-          value: data.biogenicEmissions || "",
-          isHeader: true
-        }
-      ],
-      font,
-      fontBold,
-      lightBlue
-    );
+    // Biogenic Emissions (only if provided)
+    if (data.biogenicEmissions) {
+      drawTableWithBlueHeader(
+        page2,
+        50,
+        y,
+        495,
+        [
+          {
+            label: "Direct CO2 emissions from Biogenic combustion (mtCO2)",
+            value: data.biogenicEmissions,
+            isHeader: true
+          }
+        ],
+        font,
+        fontBold,
+        lightBlue
+      );
+    }
 
     // ============================================
     // PAGE 3: BASE YEAR & METHODOLOGIES
     // ============================================
-     
-const page3 = pdfDoc.addPage([595, 842]);
-y = 760;
+    const page3 = pdfDoc.addPage([595, 842]);
+    y = 760;
 
-page3.drawText("BASE YEAR", {
-  x: 50,
-  y,
-  size: 14,
-  font: fontBold
-});
+    // Base Year Section (only if any base year data provided)
+    const hasBaseYearData = data.baseYear || data.baseYearPolicy || data.baseYearContext || 
+                            (data.baseYearEmissions && Object.keys(data.baseYearEmissions).length > 0);
 
-y -= 35;
+    if (hasBaseYearData) {
+      page3.drawText("BASE YEAR", {
+        x: 50,
+        y,
+        size: 14,
+        font: fontBold
+      });
+      y -= 35;
 
-// Year chosen as base year
-drawSingleRowTable(
-  page3,
-  50,
-  y,
-  495,
-  "Year chosen as base year",
-  data.baseYear || "",
-  font,
-  fontBold,
-  lightBlue
-);
+      if (data.baseYear) {
+        drawSingleRowTable(
+          page3,
+          50,
+          y,
+          495,
+          "Year chosen as base year",
+          data.baseYear,
+          font,
+          fontBold,
+          lightBlue
+        );
+        y -= 80;
+      }
 
-y -= 80;
+      if (data.baseYearPolicy) {
+        drawSingleRowTable(
+          page3,
+          50,
+          y,
+          495,
+          "Clarification of company-determined policy for making base year emissions recalculations",
+          data.baseYearPolicy,
+          font,
+          fontBold,
+          lightBlue
+        );
+        y -= 80;
+      }
 
-// Clarification of company-determined policy
-drawSingleRowTable(
-  page3,
-  50,
-  y,
-  495,
-  "Clarification of company-determined policy for making base year emissions recalculations",
-  data.baseYearPolicy || "",
-  font,
-  fontBold,
-  lightBlue
-);
+      if (data.baseYearContext) {
+        drawSingleRowTable(
+          page3,
+          50,
+          y,
+          495,
+          "Context for any significant emissions changes that trigger base year emissions recalculations",
+          data.baseYearContext,
+          font,
+          fontBold,
+          lightBlue
+        );
+        y -= 80;
+      }
 
-y -= 80;
-
-// Context for significant emissions changes
-drawSingleRowTable(
-  page3,
-  50,
-  y,
-  495,
-  "Context for any significant emissions changes that trigger base year emissions recalculations",
-  data.baseYearContext || "",
-  font,
-  fontBold,
-  lightBlue
-);
-
-y -= 80;
-
-// Base year emissions header
-drawTableWithBlueHeader(
-  page3,
-  50,
-  y,
-  495,
-  [
-    {
-      label: "Base year emissions",
-      value: "",
-      isHeader: true
+      if (data.baseYearEmissions && Object.keys(data.baseYearEmissions).length > 0) {
+        drawTableWithBlueHeader(
+          page3,
+          50,
+          y,
+          495,
+          [
+            {
+              label: "Base year emissions",
+              value: "",
+              isHeader: true
+            }
+          ],
+          font,
+          fontBold,
+          lightBlue
+        );
+        y -= 40;
+        drawEmissionsTable(
+          page3,
+          50,
+          y,
+          495,
+          data.baseYearEmissions,
+          font,
+          fontBold,
+          lightBlue
+        );
+        y -= 140;
+      }
     }
-  ],
-  font,
-  fontBold,
-  lightBlue
-);
 
-y -= 40;
-drawEmissionsTable(
-  page3,
-  50,
-  y,
-  495,
-  data.baseYearEmissions || {},
-  font,
-  fontBold,
-  lightBlue
-);
-
-y -= 140;
-page3.drawText("METHODOLOGIES AND EMISSION FACTORS", {
-  x: 50,
-  y,
-  size: 14,
-  font: fontBold
-});
-
-y -= 35;
-drawSingleRowTable(
-  page3,
-  50,
-  y,
-  495,
-  "Methodologies used to calculate or measure emissions other than those provided by the GHG Protocol. (Provide a reference or link to any non-GHG Protocol calculation tools used)",
-  data.methodologies || "",
-  font,
-  fontBold,
-  lightBlue
-);
+    // Methodologies Section (only if provided)
+    if (data.methodologies) {
+      page3.drawText("METHODOLOGIES AND EMISSION FACTORS", {
+        x: 50,
+        y,
+        size: 14,
+        font: fontBold
+      });
+      y -= 35;
+      drawSingleRowTable(
+        page3,
+        50,
+        y,
+        495,
+        "Methodologies used to calculate or measure emissions other than those provided by the GHG Protocol. (Provide a reference or link to any non-GHG Protocol calculation tools used)",
+        data.methodologies,
+        font,
+        fontBold,
+        lightBlue
+      );
+    }
 
     // ============================================
     // PAGE 4: DETAILED EMISSIONS & ORG TABLE
@@ -1779,784 +1423,784 @@ drawSingleRowTable(
     const page4 = pdfDoc.addPage([595, 842]);
     y = 760;
 
-    page4.drawText("ORGANIZATIONAL BOUNDARIES", {
-      x: 50,
-      y,
-      size: 14,
-      font: fontBold
-    });
+    // Organizational Boundaries Table (only if data provided)
+    if (data.organizationalBoundaries && data.organizationalBoundaries.length > 0) {
+      page4.drawText("ORGANIZATIONAL BOUNDARIES", {
+        x: 50,
+        y,
+        size: 14,
+        font: fontBold
+      });
+      y -= 35;
+      drawOrganizationalTable(
+        page4,
+        50,
+        y,
+        495,
+        data.organizationalBoundaries,
+        font,
+        fontBold,
+        lightBlue
+      );
+      y -= 150;
+    }
 
-    y -= 35;
-    drawOrganizationalTable(
-      page4,
-      50,
-      y,
-      495,
-      data.organizationalBoundaries || [],
-      font,
-      fontBold,
-      lightBlue
-    );
+    // Organizational Diagram (only if provided)
+    if (data.organizationalDiagram) {
+      drawSingleRowTable(
+        page4,
+        50,
+        y,
+        495,
+        "If the reporting company's parent company does not report emissions, include an organizational diagram that clearly defines relationship of the reporting subsidiary as well as other subsidiaries",
+        data.organizationalDiagram,
+        font,
+        fontBold,
+        lightBlue
+      );
+      y -= 120;
+    }
 
- 
+    // Detailed Emissions by Source Type (only show if any data exists)
+    const hasDetailedEmissions = data.stationaryCombustion || data.mobileCombustion || 
+      data.processSources || data.fugitiveSources || data.agriculturalSources ||
+      data.electricity || data.steam || data.heating || data.cooling ||
+      data.purchased_goods_services || data.capital_goods || data.fuel_energy_related ||
+      data.upstream_transport_distribution || data.waste_generated || data.business_travel ||
+      data.employee_commuting || data.upstream_leased_assets || 
+      data.downstream_transport_distribution || data.processing_sold_products ||
+      data.use_sold_products || data.end_of_life_sold_products ||
+      data.downstream_leased_assets || data.franchises || data.investments;
 
+    if (hasDetailedEmissions) {
+      page4.drawText("INFORMATION ON EMISSIONS", {
+        x: 50,
+        y,
+        size: 14,
+        font: fontBold
+      });
+      y -= 35;
 
-y -= 150;
-drawSingleRowTable(
-  page4,
-  50,
-  y,
-  495,
-  "If the reporting company's parent company does not report emissions, include an organizational diagram that clearly defines relationship of the reporting subsidiary as well as other subsidiaries",
-  data.organizationalDiagram || "",
-  font,
-  fontBold,
-  lightBlue
-);
+      const detailedEmissions = [
+        { label: "Emissions disaggregated by source types", value: "", isHeader: true }
+      ];
 
-y -= 120; // Increased spacing from 80 to 100
+      // Add Scope 1 section if any Scope 1 data exists
+      const hasScope1 = data.stationaryCombustion || data.mobileCombustion || 
+                        data.processSources || data.fugitiveSources || data.agriculturalSources;
+      
+      if (hasScope1) {
+        detailedEmissions.push({
+          label: "Scope 1: Direct Emissions from Owned/Controlled Operations",
+          value: "",
+          subHeader: true
+        });
+        if (data.stationaryCombustion) detailedEmissions.push({
+          label: "a. Direct Emissions from Stationary Combustion",
+          value: data.stationaryCombustion
+        });
+        if (data.mobileCombustion) detailedEmissions.push({
+          label: "b. Direct Emissions from Mobile Combustion",
+          value: data.mobileCombustion
+        });
+        if (data.processSources) detailedEmissions.push({
+          label: "c. Direct Emissions from Process Sources",
+          value: data.processSources
+        });
+        if (data.fugitiveSources) detailedEmissions.push({
+          label: "d. Direct Emissions from Fugitive Sources",
+          value: data.fugitiveSources
+        });
+        if (data.agriculturalSources) detailedEmissions.push({
+          label: "e. Direct Emissions from Agricultural Sources",
+          value: data.agriculturalSources
+        });
+      }
 
-page4.drawText("INFORMATION ON EMISSIONS", {
-  x: 50,
-  y,
-  size: 14,
-  font: fontBold
-});
+      // Add Scope 2 section if any Scope 2 data exists
+      const hasScope2 = data.electricity || data.steam || data.heating || data.cooling;
+      
+      if (hasScope2) {
+        detailedEmissions.push({
+          label: "Scope 2: Indirect Emissions from the Use of Purchased Electricity, Steam, Heating and Cooling",
+          value: "",
+          subHeader: true
+        });
+        if (data.electricity) detailedEmissions.push({
+          label: "a. Indirect Emissions from Purchased/Acquired Electricity",
+          value: data.electricity
+        });
+        if (data.steam) detailedEmissions.push({
+          label: "b. Indirect Emissions from Purchased/Acquired Steam",
+          value: data.steam
+        });
+        if (data.heating) detailedEmissions.push({
+          label: "c. Indirect Emissions from Purchased/Acquired Heating",
+          value: data.heating
+        });
+        if (data.cooling) detailedEmissions.push({
+          label: "d. Indirect Emissions from Purchased/Acquired Cooling",
+          value: data.cooling
+        });
+      }
 
-y -= 35;
+      // Add Scope 3 section if any Scope 3 data exists
+      const hasScope3 = data.purchased_goods_services || data.capital_goods || 
+        data.fuel_energy_related || data.upstream_transport_distribution || 
+        data.waste_generated || data.business_travel || data.employee_commuting ||
+        data.upstream_leased_assets || data.downstream_transport_distribution ||
+        data.processing_sold_products || data.use_sold_products ||
+        data.end_of_life_sold_products || data.downstream_leased_assets ||
+        data.franchises || data.investments;
 
-const detailedEmissions = [
-  { label: "Emissions disaggregated by source types", value: "", isHeader: true },
-  {
-    label: "Scope 1: Direct Emissions from Owned/Controlled Operations",
-    value: "",
-    subHeader: true
-  },
-  {
-    label: "a. Direct Emissions from Stationary Combustion",
-    value: data.stationaryCombustion || ""
-  },
-  {
-    label: "b. Direct Emissions from Mobile Combustion",
-    value: data.mobileCombustion || ""
-  },
-  {
-    label: "c. Direct Emissions from Process Sources",
-    value: data.processSources || ""
-  },
-  {
-    label: "d. Direct Emissions from Fugitive Sources",
-    value: data.fugitiveSources || ""
-  },
-  {
-    label: "e. Direct Emissions from Agricultural Sources",
-    value: data.agriculturalSources || ""
-  },
-  {
-    label:
-      "Scope 2: Indirect Emissions from the Use of Purchased Electricity, Steam, Heating and Cooling",
-    value: "",
-    subHeader: true
-  },
-  {
-    label: "a. Indirect Emissions from Purchased/Acquired Electricity",
-    value: data.electricity || ""
-  },
-  {
-    label: "b. Indirect Emissions from Purchased/Acquired Steam",
-    value: data.steam || ""
-  },
-  {
-    label: "c. Indirect Emissions from Purchased/Acquired Heating",
-    value: data.heating || ""
-  },
-  {
-    label: "d. Indirect Emissions from Purchased/Acquired Cooling",
-    value: data.cooling || ""
-  }, 
-  // {
-  //   label: "Scope 3: Other Indirect Emissions (15 Categories)",
-  //   value: "",
-  //   subHeader: true
-  // },
+      if (hasScope3) {
+        detailedEmissions.push({
+          label: "Scope 3: Other Indirect Emissions (15 Categories)",
+          value: "",
+          subHeader: true
+        });
+        
+        if (data.purchased_goods_services) detailedEmissions.push({
+          label: "1. Purchased Goods and Services",
+          value: data.purchased_goods_services
+        });
+        if (data.capital_goods) detailedEmissions.push({
+          label: "2. Capital Goods",
+          value: data.capital_goods
+        });
+        if (data.fuel_energy_related) detailedEmissions.push({
+          label: "3. Fuel- and Energy-Related Activities (not included in Scope 1 or 2)",
+          value: data.fuel_energy_related
+        });
+        if (data.upstream_transport_distribution) detailedEmissions.push({
+          label: "4. Upstream Transportation and Distribution",
+          value: data.upstream_transport_distribution
+        });
+        if (data.waste_generated) detailedEmissions.push({
+          label: "5. Waste Generated in Operations",
+          value: data.waste_generated
+        });
+        if (data.business_travel) detailedEmissions.push({
+          label: "6. Business Travel",
+          value: data.business_travel
+        });
+        if (data.employee_commuting) detailedEmissions.push({
+          label: "7. Employee Commuting",
+          value: data.employee_commuting
+        });
+        if (data.upstream_leased_assets) detailedEmissions.push({
+          label: "8. Upstream Leased Assets",
+          value: data.upstream_leased_assets
+        });
+      }
 
-  // {
-  //   label: "1. Purchased Goods and Services",
-  //   value: data.purchased_goods_services || ""
-  // },
-  // {
-  //   label: "2. Capital Goods",
-  //   value: data.capital_goods || ""
-  // },
-  // {
-  //   label: "3. Fuel- and Energy-Related Activities (not included in Scope 1 or 2)",
-  //   value: data.fuel_energy_related || ""
-  // },
-  // {
-  //   label: "4. Upstream Transportation and Distribution",
-  //   value: data.upstream_transport_distribution || ""
-  // },
-  // {
-  //   label: "5. Waste Generated in Operations",
-  //   value: data.waste_generated || ""
-  // },
-  // {
-  //   label: "6. Business Travel",
-  //   value: data.business_travel || ""
-  // },
-  // {
-  //   label: "7. Employee Commuting",
-  //   value: data.employee_commuting || ""
-  // },
-  // {
-  //   label: "8. Upstream Leased Assets",
-  //   value: data.upstream_leased_assets || ""
-  // }, 
+      // Check if we need to split across pages (more than 25 rows)
+      if (detailedEmissions.length <= 25) {
+        drawDetailedEmissionsTable(
+          page4,
+          50,
+          y,
+          495,
+          detailedEmissions,
+          font,
+          fontBold,
+          lightBlue
+        );
+      } else {
+        // Draw first part
+        drawDetailedEmissionsTable(
+          page4,
+          50,
+          y,
+          495,
+          detailedEmissions.slice(0, 25),
+          font,
+          fontBold,
+          lightBlue
+        );
 
-];
+        // Continue remaining Scope 3 on new page
+        const page4a = pdfDoc.addPage([595, 842]);
+        y = 760;
 
-drawDetailedEmissionsTable(
-  page4,
-  50,
-  y,
-  495,
-  detailedEmissions,
-  font,
-  fontBold,
-  lightBlue
-);
+        page4a.drawText("INFORMATION ON EMISSIONS (Continued)", {
+          x: 50,
+          y,
+          size: 14,
+          font: fontBold
+        });
+        y -= 35;
 
+        const remainingEmissions = [
+          {
+            label: "Scope 3: Other Indirect Emissions (Continued)",
+            value: "",
+            subHeader: true
+          }
+        ];
 
+        if (data.downstream_transport_distribution) remainingEmissions.push({
+          label: "9. Downstream Transportation and Distribution",
+          value: data.downstream_transport_distribution
+        });
+        if (data.processing_sold_products) remainingEmissions.push({
+          label: "10. Processing of Sold Products",
+          value: data.processing_sold_products
+        });
+        if (data.use_sold_products) remainingEmissions.push({
+          label: "11. Use of Sold Products",
+          value: data.use_sold_products
+        });
+        if (data.end_of_life_sold_products) remainingEmissions.push({
+          label: "12. End-of-Life Treatment of Sold Products",
+          value: data.end_of_life_sold_products
+        });
+        if (data.downstream_leased_assets) remainingEmissions.push({
+          label: "13. Downstream Leased Assets",
+          value: data.downstream_leased_assets
+        });
+        if (data.franchises) remainingEmissions.push({
+          label: "14. Franchises",
+          value: data.franchises
+        });
+        if (data.investments) remainingEmissions.push({
+          label: "15. Investments",
+          value: data.investments
+        });
 
-// Continue on page 4a (new page for remaining Scope 3 categories)
-const page4a = pdfDoc.addPage([595, 842]);
-y = 760;
-
-page4a.drawText("INFORMATION ON EMISSIONS (Continued)", {
-  x: 50,
-  y,
-  size: 14,
-  font: fontBold
-});
-
-y -= 35;
-
-const detailedEmissionsScope3Continued = [
-  // {
-  //   label: "Scope 3: Other Indirect Emissions (Continued)",
-  //   value: "",
-  //   subHeader: true
-  // },
-    {
-    label: "Scope 3: Other Indirect Emissions (15 Categories)",
-    value: "",
-    subHeader: true
-  },
-
-  {
-    label: "1. Purchased Goods and Services",
-    value: data.purchased_goods_services || ""
-  },
-  {
-    label: "2. Capital Goods",
-    value: data.capital_goods || ""
-  },
-  {
-    label: "3. Fuel- and Energy-Related Activities (not included in Scope 1 or 2)",
-    value: data.fuel_energy_related || ""
-  },
-    {
-    label: "4. Upstream Transportation and Distribution",
-    value: data.upstream_transport_distribution || ""
-  },
-  {
-    label: "5. Waste Generated in Operations",
-    value: data.waste_generated || ""
-  },
-  {
-    label: "6. Business Travel",
-    value: data.business_travel || ""
-  },
-  {
-    label: "7. Employee Commuting",
-    value: data.employee_commuting || ""
-  },
-  {
-    label: "8. Upstream Leased Assets",
-    value: data.upstream_leased_assets || ""
-  }, 
-  {
-    label: "9. Downstream Transportation and Distribution",
-    value: data.downstream_transport_distribution || ""
-  },
-  {
-    label: "10. Processing of Sold Products",
-    value: data.processing_sold_products || ""
-  },
-  {
-    label: "11. Use of Sold Products",
-    value: data.use_sold_products || ""
-  },
-  {
-    label: "12. End-of-Life Treatment of Sold Products",
-    value: data.end_of_life_sold_products || ""
-  },
-  {
-    label: "13. Downstream Leased Assets",
-    value: data.downstream_leased_assets || ""
-  },
-  {
-    label: "14. Franchises",
-    value: data.franchises || ""
-  },
-  {
-    label: "15. Investments",
-    value: data.investments || ""
-  }
-];
-
-drawDetailedEmissionsTable(
-  page4a,
-  50,
-  y,
-  495,
-  detailedEmissionsScope3Continued,
-  font,
-  fontBold,
-  lightBlue
-);
-
+        drawDetailedEmissionsTable(
+          page4a,
+          50,
+          y,
+          495,
+          remainingEmissions,
+          font,
+          fontBold,
+          lightBlue
+        );
+      }
+    }
 
     // ============================================
     // PAGE 5: FURTHER EMISSIONS INFORMATION
     // ============================================
-  const page5 = pdfDoc.addPage([595, 842]);
-y = 760;
+    const hasPage5Data = (data.facilityEmissions && data.facilityEmissions.length > 0) ||
+                         (data.countryEmissions && data.countryEmissions.length > 0) ||
+                         data.ownGenerationEmissions || data.purchasedForResaleEmissions ||
+                         data.nonKyotoEmissions;
 
-page5.drawText("INFORMATION ON EMISSIONS", {
-  x: 50,
-  y,
-  size: 14,
-  font: fontBold
-});
+    if (hasPage5Data) {
+      const page5 = pdfDoc.addPage([595, 842]);
+      y = 760;
 
-y -= 40;
-
-// Facility table with header
-drawFacilityTableWithHeader(
-  page5,
-  50,
-  y,
-  495,
-  "Emissions disaggregated by facility (recommended for individual facilities with stationary combustion emissions over 10,000 mtCO2e)",
-  data.facilityEmissions || [],
-  font,
-  fontBold,
-  lightBlue
-);
-y -= 120;
-
-// Country table with header
-drawCountryTableWithHeader(
-  page5,
-  50,
-  y,
-  495,
-  "Emissions disaggregated by country",
-  data.countryEmissions || [],
-  font,
-  fontBold,
-  lightBlue
-);
-y -= 120;
-
-// Single row tables for the remaining fields
-drawSingleRowTable(
-  page5,
-  50,
-  y,
-  495,
-  "Emissions attributable to own generation of electricity, heat, or steam that is sold or transferred to another organization",
-  data.ownGenerationEmissions || "",
-  font,
-  fontBold,
-  lightBlue
-);
-y -= 80;
-
-drawSingleRowTable(
-  page5,
-  50,
-  y,
-  495,
-  "Emissions attributable to the generation of electricity, heat or steam that is purchased for re-sale to non-end users",
-  data.purchasedForResaleEmissions || "",
-  font,
-  fontBold,
-  lightBlue
-);
-y -= 80;
-
-drawSingleRowTable(
-  page5,
-  50,
-  y,
-  495,
-  "Emissions from GHGs not covered by the Kyoto Protocol (e.g., CFCs, NOx)",
-  data.nonKyotoEmissions || "",
-  font,
-  fontBold,
-  lightBlue
-);
-
-// ============================================
-// PAGE 6: EMISSIONS CONTEXT & TRENDS
-// ============================================
-const page6 = pdfDoc.addPage([595, 842]);
-y = 760;
-
-page6.drawText("INFORMATION ON EMISSIONS", {
-  x: 50,
-  y,
-  size: 14,
-  font: fontBold
-});
-
-y -= 40;
-
-drawSingleRowTable(
-  page6,
-  50,
-  y,
-  495,
-  "Information on the causes of emissions changes that did not trigger a base year emissions recalculation (e.g., process changes, efficiency improvements, plant closures)",
-  data.emissionChangeCauses || "",
-  font,
-  fontBold,
-  lightBlue
-);
-y -= 80;
-
-drawSingleRowTable(
-  page6,
-  50,
-  y,
-  495,
-  "GHG emissions data for all years between the base year and the reporting year (including details of and reasons for recalculations, if appropriate)",
-  data.historicalEmissions || "",
-  font,
-  fontBold,
-  lightBlue
-);
-y -= 80;
-
-drawSingleRowTable(
-  page6,
-  50,
-  y,
-  495,
-  "Relevant ratio performance indicators (e.g. emissions per kilowatt-hour generated, sales, etc.)",
-  data.performanceIndicators || "",
-  font,
-  fontBold,
-  lightBlue
-);
-y -= 80;
-
-drawSingleRowTable(
-  page6,
-  50,
-  y,
-  495,
-  "An outline of any GHG management/reduction programs or strategies",
-  data.managementPrograms || "",
-  font,
-  fontBold,
-  lightBlue
-);
-    // ============================================
-    // PAGE 7: ADDITIONAL INFORMATION
-    // ============================================
- const page7 = pdfDoc.addPage([595, 842]);
-y = 760;
-
-page7.drawText("ADDITIONAL INFORMATION", {
-  x: 50,
-  y,
-  size: 14,
-  font: fontBold
-});
-
-y -= 40;
-
-// First field
-drawSingleRowTable(
-  page7,
-  50,
-  y,
-  495,
-  "Information on any contractual provisions addressing GHG-related risks and obligations",
-  data.contractualProvisions || "",
-  font,
-  fontBold,
-  lightBlue
-);
-y -= 80;
-
-// Second field
-drawSingleRowTable(
-  page7,
-  50,
-  y,
-  495,
-  "An outline of any external assurance provided and a copy of any verification statement, if applicable, of the reported emissions data",
-  data.externalAssurance || "",
-  font,
-  fontBold,
-  lightBlue
-);
-y -= 80;
-
-// Third field
-drawSingleRowTable(
-  page7,
-  50,
-  y,
-  495,
-  "Information on the quality of the inventory (e.g., information on the causes and magnitude of uncertainties in emission estimates) and an outline of policies in place to improve inventory quality",
-  data.inventoryQuality || "",
-  font,
-  fontBold,
-  lightBlue
-);
-y -= 80;
-
-// Fourth field
-drawSingleRowTable(
-  page7,
-  50,
-  y,
-  495,
-  "Information on any GHG sequestration",
-  data.sequestrationInfo || "",
-  font,
-  fontBold,
-  lightBlue
-);
-
-    // ============================================
-    // PAGE 8: INFORMATION ON OFFSETS
-    // ============================================
-  // ============================================
-// PAGE 8: INFORMATION ON OFFSETS
-// ============================================
-const page8 = pdfDoc.addPage([595, 842]);
-y = 760;
-
-page8.drawText("INFORMATION ON OFFSETS", {
-  x: 50,
-  y,
-  size: 14,
-  font: fontBold
-});
-
-y -= 40;
-
-// First table with header
-drawOffsetsTableWithHeader(
-  page8,
-  50,
-  y,
-  495,
-  "Information on offsets that have been purchased or developed outside the inventory boundary",
-  data.offsetsOutsideBoundary || [],
-  font,
-  fontBold,
-  lightBlue
-);
-
-y -= 120; // Adjust spacing based on table height
-
-// Second table with header
-drawOffsetsTableWithHeader(
-  page8,
-  50,
-  y,
-  495,
-  "Information on reductions inside the inventory boundary that have been sold/transferred as offsets to a third party",
-  data.offsetsInsideBoundary || [],
-  font,
-  fontBold,
-  lightBlue
-);
-
-    // ============================================
-    // HELPER FUNCTIONS
-    // ============================================
-    function drawTableWithBlueHeader(
-      page,
-      x,
-      y,
-      width,
-      rows,
-      font,
-      fontBold,
-      blueColor
-    ) {
-      // const rowHeight = 30;
-      // If isHeader AND has value (textarea needed) → bigger box
-const rowHeight = rows.isHeader && rows.value !== "" ? 80 : 30;
-
-      let currentY = y;
-
-      rows.forEach((row) => {
-        // Draw rectangle
-        page.drawRectangle({
-          x,
-          y: currentY - rowHeight,
-          width,
-          height: rowHeight,
-          borderWidth: 1,
-          borderColor: black,
-          color: row.isHeader ? blueColor : white
-        });
-
-        // Draw text
-        const textFont = row.isHeader ? fontBold : font;
-        const textSize = row.isHeader ? 10 : 9;
-
-        if (row.value) {
-          // Two column layout
-          const colSplit = width * 0.6;
-          page.drawText(row.label, {
-            x: x + 5,
-            y: currentY - 18,
-            size: textSize,
-            font: textFont,
-            maxWidth: colSplit - 10
-          });
-          page.drawText(String(row.value), {
-            x: x + colSplit + 5,
-            y: currentY - 18,
-            size: 9,
-            font,
-            maxWidth: width - colSplit - 10
-          });
-
-          // Vertical line
-          page.drawLine({
-            start: { x: x + colSplit, y: currentY },
-            end: { x: x + colSplit, y: currentY - rowHeight },
-            thickness: 1,
-            color: black
-          });
-        } else {
-          // Full width text
-          page.drawText(row.label, {
-            x: x + 5,
-            y: currentY - 18,
-            size: textSize,
-            font: textFont,
-            maxWidth: width - 10
-          });
-        }
-
-        currentY -= rowHeight;
+      page5.drawText("INFORMATION ON EMISSIONS", {
+        x: 50,
+        y,
+        size: 14,
+        font: fontBold
       });
+      y -= 40;
+
+      if (data.facilityEmissions && data.facilityEmissions.length > 0) {
+        drawFacilityTableWithHeader(
+          page5,
+          50,
+          y,
+          495,
+          "Emissions disaggregated by facility (recommended for individual facilities with stationary combustion emissions over 10,000 mtCO2e)",
+          data.facilityEmissions,
+          font,
+          fontBold,
+          lightBlue
+        );
+        y -= 120;
+      }
+
+      if (data.countryEmissions && data.countryEmissions.length > 0) {
+        drawCountryTableWithHeader(
+          page5,
+          50,
+          y,
+          495,
+          "Emissions disaggregated by country",
+          data.countryEmissions,
+          font,
+          fontBold,
+          lightBlue
+        );
+        y -= 120;
+      }
+
+      if (data.ownGenerationEmissions) {
+        drawSingleRowTable(
+          page5,
+          50,
+          y,
+          495,
+          "Emissions attributable to own generation of electricity, heat, or steam that is sold or transferred to another organization",
+          data.ownGenerationEmissions,
+          font,
+          fontBold,
+          lightBlue
+        );
+        y -= 80;
+      }
+
+      if (data.purchasedForResaleEmissions) {
+        drawSingleRowTable(
+          page5,
+          50,
+          y,
+          495,
+          "Emissions attributable to the generation of electricity, heat or steam that is purchased for re-sale to non-end users",
+          data.purchasedForResaleEmissions,
+          font,
+          fontBold,
+          lightBlue
+        );
+        y -= 80;
+      }
+
+      if (data.nonKyotoEmissions) {
+        drawSingleRowTable(
+          page5,
+          50,
+          y,
+          495,
+          "Emissions from GHGs not covered by the Kyoto Protocol (e.g., CFCs, NOx)",
+          data.nonKyotoEmissions,
+          font,
+          fontBold,
+          lightBlue
+        );
+      }
     }
 
-    function drawSimpleTable(page, x, y, width, rows, font, fontBold) {
-      const rowHeight = 25;
-      const colSplit = width * 0.35;
-      let currentY = y;
+    // ============================================
+    // PAGE 6: EMISSIONS CONTEXT & TRENDS
+    // ============================================
+    const hasPage6Data = data.emissionChangeCauses || data.historicalEmissions ||
+                         data.performanceIndicators || data.managementPrograms;
 
-      // Draw outer border
-      page.drawRectangle({
-        x,
-        y: currentY - rowHeight * rows.length,
-        width,
-        height: rowHeight * rows.length,
-        borderWidth: 1,
-        borderColor: black
+    if (hasPage6Data) {
+      const page6 = pdfDoc.addPage([595, 842]);
+      y = 760;
+
+      page6.drawText("INFORMATION ON EMISSIONS", {
+        x: 50,
+        y,
+        size: 14,
+        font: fontBold
+      });
+      y -= 40;
+
+      if (data.emissionChangeCauses) {
+        drawSingleRowTable(
+          page6,
+          50,
+          y,
+          495,
+          "Information on the causes of emissions changes that did not trigger a base year emissions recalculation (e.g., process changes, efficiency improvements, plant closures)",
+          data.emissionChangeCauses,
+          font,
+          fontBold,
+          lightBlue
+          );
+          y -= 80;
+        }
+        if (data.historicalEmissions) {
+    drawSingleRowTable(
+      page6,
+      50,
+      y,
+      495,
+      "GHG emissions data for all years between the base year and the reporting year (including details of and reasons for recalculations, if appropriate)",
+      data.historicalEmissions,
+      font,
+      fontBold,
+      lightBlue
+    );
+    y -= 80;
+  }
+
+  if (data.performanceIndicators) {
+    drawSingleRowTable(
+      page6,
+      50,
+      y,
+      495,
+      "Relevant ratio performance indicators (e.g. emissions per kilowatt-hour generated, sales, etc.)",
+      data.performanceIndicators,
+      font,
+      fontBold,
+      lightBlue
+    );
+    y -= 80;
+  }
+
+  if (data.managementPrograms) {
+    drawSingleRowTable(
+      page6,
+      50,
+      y,
+      495,
+      "An outline of any GHG management/reduction programs or strategies",
+      data.managementPrograms,
+      font,
+      fontBold,
+      lightBlue
+    );
+  }
+}
+
+// ============================================
+// PAGE 7: ADDITIONAL INFORMATION
+// ============================================
+const hasPage7Data = data.contractualProvisions || data.externalAssurance ||
+                     data.inventoryQuality || data.sequestrationInfo;
+
+if (hasPage7Data) {
+  const page7 = pdfDoc.addPage([595, 842]);
+  y = 760;
+
+  page7.drawText("ADDITIONAL INFORMATION", {
+    x: 50,
+    y,
+    size: 14,
+    font: fontBold
+  });
+  y -= 40;
+
+  if (data.contractualProvisions) {
+    drawSingleRowTable(
+      page7,
+      50,
+      y,
+      495,
+      "Information on any contractual provisions addressing GHG-related risks and obligations",
+      data.contractualProvisions,
+      font,
+      fontBold,
+      lightBlue
+    );
+    y -= 80;
+  }
+
+  if (data.externalAssurance) {
+    drawSingleRowTable(
+      page7,
+      50,
+      y,
+      495,
+      "An outline of any external assurance provided and a copy of any verification statement, if applicable, of the reported emissions data",
+      data.externalAssurance,
+      font,
+      fontBold,
+      lightBlue
+    );
+    y -= 80;
+  }
+
+  if (data.inventoryQuality) {
+    drawSingleRowTable(
+      page7,
+      50,
+      y,
+      495,
+      "Information on the quality of the inventory (e.g., information on the causes and magnitude of uncertainties in emission estimates) and an outline of policies in place to improve inventory quality",
+      data.inventoryQuality,
+      font,
+      fontBold,
+      lightBlue
+    );
+    y -= 80;
+  }
+
+  if (data.sequestrationInfo) {
+    drawSingleRowTable(
+      page7,
+      50,
+      y,
+      495,
+      "Information on any GHG sequestration",
+      data.sequestrationInfo,
+      font,
+      fontBold,
+      lightBlue
+    );
+  }
+}
+
+// ============================================
+// PAGE 8: INFORMATION ON OFFSETS
+// ============================================
+const hasPage8Data = (data.offsetsOutsideBoundary && data.offsetsOutsideBoundary.length > 0) ||
+                     (data.offsetsInsideBoundary && data.offsetsInsideBoundary.length > 0);
+
+if (hasPage8Data) {
+  const page8 = pdfDoc.addPage([595, 842]);
+  y = 760;
+
+  page8.drawText("INFORMATION ON OFFSETS", {
+    x: 50,
+    y,
+    size: 14,
+    font: fontBold
+  });
+  y -= 40;
+
+  if (data.offsetsOutsideBoundary && data.offsetsOutsideBoundary.length > 0) {
+    drawOffsetsTableWithHeader(
+      page8,
+      50,
+      y,
+      495,
+      "Information on offsets that have been purchased or developed outside the inventory boundary",
+      data.offsetsOutsideBoundary,
+      font,
+      fontBold,
+      lightBlue
+    );
+    y -= 120;
+  }
+
+  if (data.offsetsInsideBoundary && data.offsetsInsideBoundary.length > 0) {
+    drawOffsetsTableWithHeader(
+      page8,
+      50,
+      y,
+      495,
+      "Information on reductions inside the inventory boundary that have been sold/transferred as offsets to a third party",
+      data.offsetsInsideBoundary,
+      font,
+      fontBold,
+      lightBlue
+    );
+  }
+}
+
+// ============================================
+// HELPER FUNCTIONS (Keep all your existing helper functions)
+// ============================================
+function drawTableWithBlueHeader(page, x, y, width, rows, font, fontBold, blueColor) {
+  const rowHeight = rows.isHeader && rows.value !== "" ? 80 : 30;
+  let currentY = y;
+
+  rows.forEach((row) => {
+    page.drawRectangle({
+      x,
+      y: currentY - rowHeight,
+      width,
+      height: rowHeight,
+      borderWidth: 1,
+      borderColor: black,
+      color: row.isHeader ? blueColor : white
+    });
+
+    const textFont = row.isHeader ? fontBold : font;
+    const textSize = row.isHeader ? 10 : 9;
+
+    if (row.value) {
+      const colSplit = width * 0.6;
+      page.drawText(row.label, {
+        x: x + 5,
+        y: currentY - 18,
+        size: textSize,
+        font: textFont,
+        maxWidth: colSplit - 10
+      });
+      page.drawText(String(row.value), {
+        x: x + colSplit + 5,
+        y: currentY - 18,
+        size: 9,
+        font,
+        maxWidth: width - colSplit - 10
       });
 
-      // Draw vertical line
       page.drawLine({
         start: { x: x + colSplit, y: currentY },
-        end: { x: x + colSplit, y: currentY - rowHeight * rows.length },
+        end: { x: x + colSplit, y: currentY - rowHeight },
         thickness: 1,
         color: black
       });
-
-      rows.forEach((row, idx) => {
-        if (idx > 0) {
-          page.drawLine({
-            start: { x, y: currentY },
-            end: { x: x + width, y: currentY },
-            thickness: 1,
-            color: black
-          });
-        }
-
-        page.drawText(row.label, {
-          x: x + 5,
-          y: currentY - 16,
-          size: 9,
-          font: fontBold
-        });
-
-        page.drawText(String(row.value), {
-          x: x + colSplit + 5,
-          y: currentY - 16,
-          size: 9,
-          font
-        });
-
-        currentY -= rowHeight;
+    } else {
+      page.drawText(row.label, {
+        x: x + 5,
+        y: currentY - 18,
+        size: textSize,
+        font: textFont,
+        maxWidth: width - 10
       });
     }
 
-    function drawEmissionsTable(
-      page,
-      x,
-      y,
-      width,
-      emissions,
-      font,
-      fontBold,
-      blueColor
-    ) {
-      const headers = [
-        "EMISSIONS",
-        "TOTAL\n(mt CO2e)",
-        "CO2\n(mt)",
-        "CH4\n(mt)",
-        "N2O\n(mt)",
-        "HFCs\n(mt)",
-        "PFCs\n(mt)",
-        "SF6\n(mt)"
-      ];
-      const colWidth = width / 8;
-      const rowHeight = 30;
-      let currentY = y;
+    currentY -= rowHeight;
+  });
+}
 
-      // Draw header row with blue background
-      page.drawRectangle({
-        x,
-        y: currentY - rowHeight,
-        width,
-        height: rowHeight,
-        color: blueColor,
-        borderWidth: 1,
-        borderColor: black
+function drawSimpleTable(page, x, y, width, rows, font, fontBold) {
+  const rowHeight = 25;
+  const colSplit = width * 0.35;
+  let currentY = y;
+
+  page.drawRectangle({
+    x,
+    y: currentY - rowHeight * rows.length,
+    width,
+    height: rowHeight * rows.length,
+    borderWidth: 1,
+    borderColor: black
+  });
+
+  page.drawLine({
+    start: { x: x + colSplit, y: currentY },
+    end: { x: x + colSplit, y: currentY - rowHeight * rows.length },
+    thickness: 1,
+    color: black
+  });
+
+  rows.forEach((row, idx) => {
+    if (idx > 0) {
+      page.drawLine({
+        start: { x, y: currentY },
+        end: { x: x + width, y: currentY },
+        thickness: 1,
+        color: black
       });
+    }
 
-      headers.forEach((header, idx) => {
-        const lines = header.split("\n");
+    page.drawText(row.label, {
+      x: x + 5,
+      y: currentY - 16,
+      size: 9,
+      font: fontBold
+    });
+
+    page.drawText(String(row.value), {
+      x: x + colSplit + 5,
+      y: currentY - 16,
+      size: 9,
+      font
+    });
+
+    currentY -= rowHeight;
+  });
+}
+
+function drawEmissionsTable(page, x, y, width, emissions, font, fontBold, blueColor) {
+  const headers = [
+    "EMISSIONS",
+    "TOTAL\n(mt CO2e)",
+    "CO2\n(mt)",
+    "CH4\n(mt)",
+    "N2O\n(mt)",
+    "HFCs\n(mt)",
+    "PFCs\n(mt)",
+    "SF6\n(mt)"
+  ];
+  const colWidth = width / 8;
+  const rowHeight = 30;
+  let currentY = y;
+
+  page.drawRectangle({
+    x,
+    y: currentY - rowHeight,
+    width,
+    height: rowHeight,
+    color: blueColor,
+    borderWidth: 1,
+    borderColor: black
+  });
+
+  headers.forEach((header, idx) => {
+    const lines = header.split("\n");
+    lines.forEach((line, lineIdx) => {
+      page.drawText(line, {
+        x: x + idx * colWidth + 3,
+        y: currentY - 12 - lineIdx * 10,
+        size: 8,
+        font: fontBold
+      });
+    });
+
+    if (idx > 0) {
+      page.drawLine({
+        start: { x: x + idx * colWidth, y: currentY },
+        end: { x: x + idx * colWidth, y: currentY - rowHeight * 4 },
+        thickness: 0.5,
+        color: black
+      });
+    }
+  });
+
+  currentY -= rowHeight;
+
+  const rows = [
+    [
+      "Scope 1",
+      emissions.scope1Total,
+      emissions.scope1CO2,
+      emissions.scope1CH4,
+      emissions.scope1N2O,
+      emissions.scope1HFCs,
+      emissions.scope1PFCs,
+      emissions.scope1SF6
+    ],
+    [
+      "Scope 2",
+      emissions.scope2Total,
+      emissions.scope2CO2,
+      emissions.scope2CH4,
+      emissions.scope2N2O,
+      emissions.scope2HFCs,
+      emissions.scope2PFCs,
+      emissions.scope2SF6
+    ],
+    [
+      "Scope 3\n(OPTIONAL)",
+      emissions.scope3Total,
+      emissions.scope3CO2,
+      emissions.scope3CH4,
+      emissions.scope3N2O,
+      emissions.scope3HFCs,
+      emissions.scope3PFCs,
+      emissions.scope3SF6
+    ]
+  ];
+
+  rows.forEach((row) => {
+    page.drawRectangle({
+      x,
+      y: currentY - rowHeight,
+      width,
+      height: rowHeight,
+      borderWidth: 1,
+      borderColor: black
+    });
+
+    row.forEach((cell, colIdx) => {
+      if (cell) {
+        const lines = String(cell).split("\n");
         lines.forEach((line, lineIdx) => {
           page.drawText(line, {
-            x: x + idx * colWidth + 3,
-            y: currentY - 12 - lineIdx * 10,
+            x: x + colIdx * colWidth + 3,
+            y: currentY - 18 - lineIdx * 10,
             size: 8,
-            font: fontBold
+            font
           });
         });
+      }
+    });
 
-        if (idx > 0) {
-          page.drawLine({
-            start: { x: x + idx * colWidth, y: currentY },
-            end: { x: x + idx * colWidth, y: currentY - rowHeight * 4 },
-            thickness: 0.5,
-            color: black
-          });
-        }
-      });
+    currentY -= rowHeight;
+  });
+}
 
-      currentY -= rowHeight;
-
-      // Data rows
-      const rows = [
-        [
-          "Scope 1",
-          emissions.scope1Total,
-          emissions.scope1CO2,
-          emissions.scope1CH4,
-          emissions.scope1N2O,
-          emissions.scope1HFCs,
-          emissions.scope1PFCs,
-          emissions.scope1SF6
-        ],
-        [
-          "Scope 2",
-          emissions.scope2Total,
-          emissions.scope2CO2,
-          emissions.scope2CH4,
-          emissions.scope2N2O,
-          emissions.scope2HFCs,
-          emissions.scope2PFCs,
-          emissions.scope2SF6
-        ],
-        [
-          "Scope 3\n(OPTIONAL)",
-          emissions.scope3Total,
-          emissions.scope3CO2,
-          emissions.scope3CH4,
-          emissions.scope3N2O,
-          emissions.scope3HFCs,
-          emissions.scope3PFCs,
-          emissions.scope3SF6
-        ]
-      ];
-
-      rows.forEach((row) => {
-        page.drawRectangle({
-          x,
-          y: currentY - rowHeight,
-          width,
-          height: rowHeight,
-          borderWidth: 1,
-          borderColor: black
-        });
-
-        row.forEach((cell, colIdx) => {
-          if (cell) {
-            const lines = String(cell).split("\n");
-            lines.forEach((line, lineIdx) => {
-              page.drawText(line, {
-                x: x + colIdx * colWidth + 3,
-                y: currentY - 18 - lineIdx * 10,
-                size: 8,
-                font
-              });
-            });
-          }
-        });
-
-        currentY -= rowHeight;
-      });
-    }
- 
-    function drawOrganizationalTable(
-  page,
-  x,
-  y,
-  width,
-  boundaries,
-  font,
-  fontBold,
-  blueColor
-) {
-  const colWidths = [
-    width * 0.4,
-    width * 0.2,
-    width * 0.2,
-    width * 0.2
-  ];
-  const headerHeight = 50; // Increased from 30 to accommodate 4 lines
+function drawOrganizationalTable(page, x, y, width, boundaries, font, fontBold, blueColor) {
+  const colWidths = [width * 0.4, width * 0.2, width * 0.2, width * 0.2];
+  const headerHeight = 50;
   const dataRowHeight = 30;
   let currentY = y;
 
-  // Header row
   page.drawRectangle({
     x,
     y: currentY - headerHeight,
@@ -2577,15 +2221,15 @@ const rowHeight = rows.isHeader && rows.value !== "" ? 80 : 30;
   let currentX = x;
   headers.forEach((header, idx) => {
     const lines = header.split("\n");
-    const startY = currentY - 12; // Starting position for first line
+    const startY = currentY - 12;
     
     lines.forEach((line, lineIdx) => {
       page.drawText(line, {
         x: currentX + 3,
-        y: startY - (lineIdx * 9), // 9px spacing between lines
+        y: startY - (lineIdx * 9),
         size: 7,
         font: fontBold,
-        maxWidth: colWidths[idx] - 6 // Prevent text overflow
+        maxWidth: colWidths[idx] - 6
       });
     });
 
@@ -2594,7 +2238,7 @@ const rowHeight = rows.isHeader && rows.value !== "" ? 80 : 30;
         start: { x: currentX + colWidths[idx], y: currentY },
         end: {
           x: currentX + colWidths[idx],
-          y: currentY - headerHeight - (dataRowHeight * (boundaries.length > 0 ? boundaries.length : 4))
+          y: currentY - headerHeight - (dataRowHeight * boundaries.length)
         },
         thickness: 0.5,
         color: black
@@ -2606,10 +2250,7 @@ const rowHeight = rows.isHeader && rows.value !== "" ? 80 : 30;
 
   currentY -= headerHeight;
 
-  // Data rows
-  const rowsToShow =
-    boundaries.length > 0 ? boundaries : [{}, {}, {}, {}];
-  rowsToShow.forEach((boundary) => {
+  boundaries.forEach((boundary) => {
     page.drawRectangle({
       x,
       y: currentY - dataRowHeight,
@@ -2631,7 +2272,7 @@ const rowHeight = rows.isHeader && rows.value !== "" ? 80 : 30;
         y: currentY - 18,
         size: 8,
         font,
-        maxWidth: colWidths[idx] - 6 // Prevent text overflow
+        maxWidth: colWidths[idx] - 6
       });
       currentX += colWidths[idx];
     });
@@ -2640,407 +2281,124 @@ const rowHeight = rows.isHeader && rows.value !== "" ? 80 : 30;
   });
 }
 
-    function drawDetailedEmissionsTable(
-      page,
+function drawDetailedEmissionsTable(page, x, y, width, rows, font, fontBold, blueColor) {
+  const rowHeight = 20;
+  const colSplit = width * 0.75;
+  let currentY = y;
+
+  rows.forEach((row) => {
+    const bgColor = row.isHeader ? blueColor : row.subHeader ? lightBlue : white;
+    const textFont = row.isHeader || row.subHeader ? fontBold : font;
+    const textSize = row.isHeader ? 10 : 9;
+
+    page.drawRectangle({
       x,
-      y,
+      y: currentY - rowHeight,
       width,
-      rows,
-      font,
-      fontBold,
-      blueColor
-    ) {
-      const rowHeight = 20;
-      const colSplit = width * 0.75;
-      let currentY = y;
+      height: rowHeight,
+      color: bgColor,
+      borderWidth: 1,
+      borderColor: black
+    });
 
-      rows.forEach((row) => {
-        const bgColor = row.isHeader
-          ? blueColor
-          : row.subHeader
-          ? lightBlue
-          : white;
-        const textFont = row.isHeader || row.subHeader ? fontBold : font;
-        const textSize = row.isHeader ? 10 : 9;
-
-        page.drawRectangle({
-          x,
-          y: currentY - rowHeight,
-          width,
-          height: rowHeight,
-          color: bgColor,
-          borderWidth: 1,
-          borderColor: black
-        });
-
-        if (!row.isHeader && !row.subHeader) {
-          page.drawLine({
-            start: { x: x + colSplit, y: currentY },
-            end: { x: x + colSplit, y: currentY - rowHeight },
-            thickness: 0.5,
-            color: black
-          });
-        }
-
-        page.drawText(row.label, {
-          x: x + 5,
-          y: currentY - 14,
-          size: textSize,
-          font: textFont
-        });
-
-        if (row.value && !row.isHeader && !row.subHeader) {
-          page.drawText(String(row.value), {
-            x: x + colSplit + 5,
-            y: currentY - 14,
-            size: 8,
-            font
-          });
-        }
-
-        currentY -= rowHeight;
-      });
-    }
-
-    // New helper: labeled multiline box
-    function drawLabeledTextArea(
-      page,
-      x,
-      y,
-      width,
-      boxHeight,
-      label,
-      value,
-      font,
-      fontBold
-    ) {
-      // Label
-      page.drawText(label, {
-        x,
-        y,
-        size: 9,
-        font: fontBold,
-        maxWidth: width
-      });
-
-      const rectTop = y - 18;
-
-      // Box
-      page.drawRectangle({
-        x,
-        y: rectTop - boxHeight,
-        width,
-        height: boxHeight,
-        borderWidth: 1,
-        borderColor: black
-      });
-
-      if (value) {
-        page.drawText(String(value), {
-          x: x + 5,
-          y: rectTop - 14,
-          size: 9,
-          font,
-          maxWidth: width - 10
-        });
-      }
-
-      // return new y slightly below box
-      return rectTop - boxHeight - 20;
-    }
-
-    // New helper: facility table
-    function drawFacilityTable(
-      page,
-      x,
-      y,
-      width,
-      facilities,
-      font,
-      fontBold,
-      blueColor
-    ) {
-      const rowHeight = 22;
-      const headerHeight = rowHeight;
-      const colWidths = [width * 0.6, width * 0.4];
-      let currentY = y;
-
-      // Header background
-      page.drawRectangle({
-        x,
-        y: currentY - headerHeight,
-        width,
-        height: headerHeight,
-        color: blueColor,
-        borderWidth: 1,
-        borderColor: black
-      });
-
-      // Header text
-      page.drawText("Facility", {
-        x: x + 5,
-        y: currentY - 15,
-        size: 9,
-        font: fontBold
-      });
-      page.drawText("Scope 1 emissions", {
-        x: x + colWidths[0] + 5,
-        y: currentY - 15,
-        size: 9,
-        font: fontBold
-      });
-
-      // Vertical divider
+    if (!row.isHeader && !row.subHeader) {
       page.drawLine({
-        start: { x: x + colWidths[0], y: currentY },
-        end: {
-          x: x + colWidths[0],
-          y: currentY - headerHeight - rowHeight * 5
-        },
+        start: { x: x + colSplit, y: currentY },
+        end: { x: x + colSplit, y: currentY - rowHeight },
         thickness: 0.5,
         color: black
       });
-
-      currentY -= headerHeight;
-
-      const rowsToShow =
-        facilities.length > 0 ? facilities : [{}, {}, {}, {}, {}];
-
-      rowsToShow.forEach((f) => {
-        page.drawRectangle({
-          x,
-          y: currentY - rowHeight,
-          width,
-          height: rowHeight,
-          borderWidth: 1,
-          borderColor: black
-        });
-
-        const facilityName = f.facility || "";
-        const scope1 = f.scope1Emissions || "";
-
-        page.drawText(String(facilityName), {
-          x: x + 5,
-          y: currentY - 14,
-          size: 8,
-          font
-        });
-        page.drawText(String(scope1), {
-          x: x + colWidths[0] + 5,
-          y: currentY - 14,
-          size: 8,
-          font
-        });
-
-        currentY -= rowHeight;
-      });
     }
 
-    // New helper: country table
-    function drawCountryTable(
-      page,
-      x,
-      y,
-      width,
-      countries,
-      font,
-      fontBold,
-      blueColor
-    ) {
-      const rowHeight = 22;
-      const headerHeight = rowHeight;
-      const colWidths = [width * 0.6, width * 0.4];
-      let currentY = y;
+    page.drawText(row.label, {
+      x: x + 5,
+      y: currentY - 14,
+      size: textSize,
+      font: textFont
+    });
 
-      // Header background
-      page.drawRectangle({
-        x,
-        y: currentY - headerHeight,
-        width,
-        height: headerHeight,
-        color: blueColor,
-        borderWidth: 1,
-        borderColor: black
-      });
-
-      // Header text
-      page.drawText("Country", {
-        x: x + 5,
-        y: currentY - 15,
-        size: 9,
-        font: fontBold
-      });
-      page.drawText("Emissions (specify Scopes included)", {
-        x: x + colWidths[0] + 5,
-        y: currentY - 15,
+    if (row.value && !row.isHeader && !row.subHeader) {
+      page.drawText(String(row.value), {
+        x: x + colSplit + 5,
+        y: currentY - 14,
         size: 8,
-        font: fontBold
-      });
-
-      // Vertical divider
-      page.drawLine({
-        start: { x: x + colWidths[0], y: currentY },
-        end: {
-          x: x + colWidths[0],
-          y: currentY - headerHeight - rowHeight * 5
-        },
-        thickness: 0.5,
-        color: black
-      });
-
-      currentY -= headerHeight;
-
-      const rowsToShow =
-        countries.length > 0 ? countries : [{}, {}, {}, {}, {}];
-
-      rowsToShow.forEach((c) => {
-        page.drawRectangle({
-          x,
-          y: currentY - rowHeight,
-          width,
-          height: rowHeight,
-          borderWidth: 1,
-          borderColor: black
-        });
-
-        const countryName = c.country || "";
-        const emissions = c.emissions || "";
-
-        page.drawText(String(countryName), {
-          x: x + 5,
-          y: currentY - 14,
-          size: 8,
-          font
-        });
-        page.drawText(String(emissions), {
-          x: x + colWidths[0] + 5,
-          y: currentY - 14,
-          size: 8,
-          font
-        });
-
-        currentY -= rowHeight;
+        font
       });
     }
 
-    // New helper: offsets table (3 columns)
-    // function drawOffsetsTable(
-    //   page,
-    //   x,
-    //   y,
-    //   width,
-    //   rows,
-    //   font,
-    //   fontBold,
-    //   blueColor
-    // ) {
-    //   const rowHeight = 22;
-    //   const headerHeight = rowHeight;
-    //   const colWidths = [
-    //     width * 0.22,
-    //     width * 0.48,
-    //     width * 0.3
-    //   ];
-    //   let currentY = y;
+    currentY -= rowHeight;
+  });
+}
 
-    //   // Header background
-    //   page.drawRectangle({
-    //     x,
-    //     y: currentY - headerHeight,
-    //     width,
-    //     height: headerHeight,
-    //     color: blueColor,
-    //     borderWidth: 1,
-    //     borderColor: black
-    //   });
+function drawSingleRowTable(page, x, y, width, headerText, value, font, fontBold, blueColor) {
+  let currentY = y;
 
-    //   const headerTitles = [
-    //     "Quantity of GHGs (mtCO2e)",
-    //     "Type of offset project",
-    //     "Were the offsets verified/certified and/or approved by an external GHG program (e.g., CDM)"
-    //   ];
+  const maxHeaderWidth = width - 10;
+  const words = headerText.split(' ');
+  let lines = [];
+  let currentLine = '';
 
-    //   let currentX = x;
-    //   headerTitles.forEach((title, idx) => {
-    //     page.drawText(title, {
-    //       x: currentX + 3,
-    //       y: currentY - 14,
-    //       size: 7,
-    //       font: fontBold,
-    //       maxWidth: colWidths[idx] - 6
-    //     });
+  words.forEach(word => {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const testWidth = fontBold.widthOfTextAtSize(testLine, 9);
+    
+    if (testWidth > maxHeaderWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+  if (currentLine) lines.push(currentLine);
 
-    //     if (idx < headerTitles.length - 1) {
-    //       page.drawLine({
-    //         start: { x: currentX + colWidths[idx], y: currentY },
-    //         end: {
-    //           x: currentX + colWidths[idx],
-    //           y: currentY - headerHeight - rowHeight * 5
-    //         },
-    //         thickness: 0.5,
-    //         color: black
-    //       });
-    //     }
+  const headerHeight = Math.max(30, lines.length * 12 + 10);
 
-    //     currentX += colWidths[idx];
-    //   });
+  page.drawRectangle({
+    x,
+    y: currentY - headerHeight,
+    width,
+    height: headerHeight,
+    color: blueColor,
+    borderWidth: 1,
+    borderColor: black
+  });
 
-    //   currentY -= headerHeight;
+  lines.forEach((line, idx) => {
+    page.drawText(line, {
+      x: x + 5,
+      y: currentY - 15 - (idx * 12),
+      size: 9,
+      font: fontBold
+    });
+  });
 
-    //   const rowsToShow = rows.length > 0 ? rows : [{}, {}, {}, {}, {}];
+  currentY -= headerHeight;
 
-    //   rowsToShow.forEach((row) => {
-    //     currentX = x;
+  const dataRowHeight = 50;
+  page.drawRectangle({
+    x,
+    y: currentY - dataRowHeight,
+    width,
+    height: dataRowHeight,
+    borderWidth: 1,
+    borderColor: black
+  });
 
-    //     page.drawRectangle({
-    //       x,
-    //       y: currentY - rowHeight,
-    //       width,
-    //       height: rowHeight,
-    //       borderWidth: 1,
-    //       borderColor: black
-    //     });
+  if (value) {
+    page.drawText(String(value), {
+      x: x + 5,
+      y: currentY - 15,
+      size: 9,
+      font,
+      maxWidth: width - 10
+    });
+  }
+}
 
-    //     const quantity = row.quantity || "";
-    //     const projectType = row.projectType || "";
-    //     const verified = row.verified || "";
-
-    //     const cells = [quantity, projectType, verified];
-
-    //     cells.forEach((cell, idx) => {
-    //       page.drawText(String(cell), {
-    //         x: currentX + 3,
-    //         y: currentY - 14,
-    //         size: 8,
-    //         font,
-    //         maxWidth: colWidths[idx] - 6
-    //       });
-    //       currentX += colWidths[idx];
-    //     });
-
-    //     currentY -= rowHeight;
-    //   });
-    // }
-
-
-
-    // New helper: offsets table with header (3 columns, 2 data rows)
- // New helper: offsets table with header (3 columns, 2 data rows)
-function drawOffsetsTableWithHeader(
-  page,
-  x,
-  y,
-  width,
-  headerText,
-  rows,
-  font,
-  fontBold,
-  blueColor
-) {
+function drawFacilityTableWithHeader(page, x, y, width, headerText, facilities, font, fontBold, blueColor) {
   const rowHeight = 22;
   let currentY = y;
 
-  // Calculate header height based on text wrapping
   const maxHeaderWidth = width - 10;
   const words = headerText.split(' ');
   let lines = [];
@@ -3061,7 +2419,6 @@ function drawOffsetsTableWithHeader(
 
   const headerHeight = Math.max(25, lines.length * 12 + 10);
 
-  // Draw main header with blue background
   page.drawRectangle({
     x,
     y: currentY - headerHeight,
@@ -3072,7 +2429,6 @@ function drawOffsetsTableWithHeader(
     borderColor: black
   });
 
-  // Draw wrapped header text
   lines.forEach((line, idx) => {
     page.drawText(line, {
       x: x + 5,
@@ -3084,7 +2440,218 @@ function drawOffsetsTableWithHeader(
 
   currentY -= headerHeight;
 
-  // Column headers with proper wrapping
+  const colWidths = [width * 0.6, width * 0.4];
+  
+  page.drawRectangle({
+    x,
+    y: currentY - rowHeight,
+    width,
+    height: rowHeight,
+    color: lightBlue,
+    borderWidth: 1,
+    borderColor: black
+  });
+
+  page.drawText("Facility", {
+    x: x + 5,
+    y: currentY - 15,
+    size: 9,
+    font: fontBold
+  });
+  page.drawText("Scope 1 emissions", {
+    x: x + colWidths[0] + 5,
+    y: currentY - 15,
+    size: 9,
+    font: fontBold
+  });
+
+  page.drawLine({
+    start: { x: x + colWidths[0], y: currentY },
+    end: { x: x + colWidths[0], y: currentY - rowHeight * (facilities.length + 1) },
+    thickness: 0.5,
+    color: black
+  });
+
+  currentY -= rowHeight;
+
+  facilities.forEach((f) => {
+    page.drawRectangle({
+      x,
+      y: currentY - rowHeight,
+      width,
+      height: rowHeight,
+      borderWidth: 1,
+      borderColor: black
+    });
+
+    page.drawText(String(f.facility || ""), {
+      x: x + 5,
+      y: currentY - 14,
+      size: 8,
+      font
+    });
+    page.drawText(String(f.scope1Emissions || ""), {
+      x: x + colWidths[0] + 5,
+      y: currentY - 14,
+      size: 8,
+      font
+    });
+
+    currentY -= rowHeight;
+  });
+}
+
+function drawCountryTableWithHeader(page, x, y, width, headerText, countries, font, fontBold, blueColor) {
+  const rowHeight = 22;
+  let currentY = y;
+
+  const maxHeaderWidth = width - 10;
+  const words = headerText.split(' ');
+  let lines = [];
+  let currentLine = '';
+
+  words.forEach(word => {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const testWidth = fontBold.widthOfTextAtSize(testLine, 9);
+    
+    if (testWidth > maxHeaderWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+  if (currentLine) lines.push(currentLine);
+
+  const headerHeight = Math.max(25, lines.length * 12 + 10);
+
+  page.drawRectangle({
+    x,
+    y: currentY - headerHeight,
+    width,
+    height: headerHeight,
+    color: blueColor,
+    borderWidth: 1,
+    borderColor: black
+  });
+
+  lines.forEach((line, idx) => {
+    page.drawText(line, {
+      x: x + 5,
+      y: currentY - 15 - (idx * 12),
+      size: 9,
+      font: fontBold
+    });
+  });
+
+  currentY -= headerHeight;
+
+  const colWidths = [width * 0.6, width * 0.4];
+  
+  page.drawRectangle({
+    x,
+    y: currentY - rowHeight,
+    width,
+    height: rowHeight,
+    color: lightBlue,
+    borderWidth: 1,
+    borderColor: black
+  });
+
+  page.drawText("Country", {
+    x: x + 5,
+    y: currentY - 15,
+    size: 9,
+    font: fontBold
+  });
+  page.drawText("Emissions (specify Scopes included)", {
+    x: x + colWidths[0] + 5,
+    y: currentY - 15,
+    size: 8,
+    font: fontBold
+  });
+
+  page.drawLine({
+    start: { x: x + colWidths[0], y: currentY },
+    end: { x: x + colWidths[0], y: currentY - rowHeight * (countries.length + 1) },
+    thickness: 0.5,
+    color: black
+  });
+
+  currentY -= rowHeight;
+
+  countries.forEach((c) => {
+    page.drawRectangle({
+      x,
+      y: currentY - rowHeight,
+      width,
+      height: rowHeight,
+      borderWidth: 1,
+      borderColor: black
+    });
+
+    page.drawText(String(c.country || ""), {
+      x: x + 5,
+      y: currentY - 14,
+      size: 8,
+      font
+    });
+    page.drawText(String(c.emissions || ""), {
+      x: x + colWidths[0] + 5,
+      y: currentY - 14,
+      size: 8,
+      font
+    });
+
+    currentY -= rowHeight;
+  });
+}
+
+function drawOffsetsTableWithHeader(page, x, y, width, headerText, rows, font, fontBold, blueColor) {
+  const rowHeight = 22;
+  let currentY = y;
+
+  const maxHeaderWidth = width - 10;
+  const words = headerText.split(' ');
+  let lines = [];
+  let currentLine = '';
+
+  words.forEach(word => {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const testWidth = fontBold.widthOfTextAtSize(testLine, 9);
+    
+    if (testWidth > maxHeaderWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+  if (currentLine) lines.push(currentLine);
+
+  const headerHeight = Math.max(25, lines.length * 12 + 10);
+
+  page.drawRectangle({
+    x,
+    y: currentY - headerHeight,
+    width,
+    height: headerHeight,
+    color: blueColor,
+    borderWidth: 1,
+    borderColor: black
+  });
+
+  lines.forEach((line, idx) => {
+    page.drawText(line, {
+      x: x + 5,
+      y: currentY - 15 - (idx * 12),
+      size: 9,
+      font: fontBold
+    });
+  });
+
+  currentY -= headerHeight;
+
   const colWidths = [width * 0.22, width * 0.48, width * 0.3];
   
   const columnTitles = [
@@ -3093,7 +2660,6 @@ function drawOffsetsTableWithHeader(
     "Were the offsets verified/certified and/or approved by an external GHG program (e.g., CDM)"
   ];
 
-  // Calculate required height for column headers
   let maxLines = 1;
   columnTitles.forEach((title, idx) => {
     const colMaxWidth = colWidths[idx] - 6;
@@ -3131,7 +2697,6 @@ function drawOffsetsTableWithHeader(
 
   let currentX = x;
   columnTitles.forEach((title, idx) => {
-    // Wrap text for this column
     const colMaxWidth = colWidths[idx] - 6;
     const titleWords = title.split(' ');
     let titleLines = [];
@@ -3150,7 +2715,6 @@ function drawOffsetsTableWithHeader(
     });
     if (titleLine) titleLines.push(titleLine);
 
-    // Draw wrapped column header text
     titleLines.forEach((line, lineIdx) => {
       page.drawText(line, {
         x: currentX + 3,
@@ -3166,7 +2730,7 @@ function drawOffsetsTableWithHeader(
         start: { x: currentX + colWidths[idx], y: currentY },
         end: {
           x: currentX + colWidths[idx],
-          y: currentY - columnHeaderHeight - rowHeight * 2
+          y: currentY - columnHeaderHeight - rowHeight * rows.length
         },
         thickness: 0.5,
         color: black
@@ -3178,13 +2742,7 @@ function drawOffsetsTableWithHeader(
 
   currentY -= columnHeaderHeight;
 
-  // Only 2 data rows
-  const rowsToShow = rows.length > 0 ? rows.slice(0, 2) : [{}, {}];
-  while (rowsToShow.length < 2) {
-    rowsToShow.push({});
-  }
-
-  rowsToShow.forEach((row) => {
+  rows.forEach((row) => {
     currentX = x;
 
     page.drawRectangle({
@@ -3196,11 +2754,7 @@ function drawOffsetsTableWithHeader(
       borderColor: black
     });
 
-    const quantity = row.quantity || "";
-    const projectType = row.projectType || "";
-    const verified = row.verified || "";
-
-    const cells = [quantity, projectType, verified];
+    const cells = [row.quantity || "", row.projectType || "", row.verified || ""];
 
     cells.forEach((cell, idx) => {
       page.drawText(String(cell), {
@@ -3217,385 +2771,31 @@ function drawOffsetsTableWithHeader(
   });
 }
 
+// ============================================
+// FINALIZE PDF
+// ============================================
+const pdfBytes = await pdfDoc.save();
+const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+const filename = `GHG-Protocol-Report-${timestamp}.pdf`;
 
-// New helper: Single row table with blue header
-function drawSingleRowTable(
-  page,
-  x,
-  y,
-  width,
-  headerText,
-  value,
-  font,
-  fontBold,
-  blueColor
-) {
-  let currentY = y;
-
-  // Calculate header height based on text wrapping
-  const maxHeaderWidth = width - 10;
-  const words = headerText.split(' ');
-  let lines = [];
-  let currentLine = '';
-
-  words.forEach(word => {
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    const testWidth = fontBold.widthOfTextAtSize(testLine, 9);
-    
-    if (testWidth > maxHeaderWidth && currentLine) {
-      lines.push(currentLine);
-      currentLine = word;
-    } else {
-      currentLine = testLine;
-    }
-  });
-  if (currentLine) lines.push(currentLine);
-
-  const headerHeight = Math.max(30, lines.length * 12 + 10);
-
-  // Draw header with blue background
-  page.drawRectangle({
-    x,
-    y: currentY - headerHeight,
-    width,
-    height: headerHeight,
-    color: blueColor,
-    borderWidth: 1,
-    borderColor: black
-  });
-
-  // Draw wrapped header text
-  lines.forEach((line, idx) => {
-    page.drawText(line, {
-      x: x + 5,
-      y: currentY - 15 - (idx * 12),
-      size: 9,
-      font: fontBold
-    });
-  });
-
-  currentY -= headerHeight;
-
-  // Draw single data row
-  const dataRowHeight = 50;
-  page.drawRectangle({
-    x,
-    y: currentY - dataRowHeight,
-    width,
-    height: dataRowHeight,
-    borderWidth: 1,
-    borderColor: black
-  });
-
-  // Draw value text (if provided)
-  if (value) {
-    page.drawText(String(value), {
-      x: x + 5,
-      y: currentY - 15,
-      size: 9,
-      font,
-      maxWidth: width - 10
-    });
-  }
+res.setHeader("Content-Type", "application/pdf");
+res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+res.setHeader("Content-Length", pdfBytes.length);
+res.send(Buffer.from(pdfBytes));
+} catch (err) {
+console.log(err);
+res.status(500).json({ error: "PDF generation failed", detail: err.message });
 }
-
-
-
-
-
-// Helper: Facility table with header (2 columns, 2 data rows)
-function drawFacilityTableWithHeader(
-  page,
-  x,
-  y,
-  width,
-  headerText,
-  facilities,
-  font,
-  fontBold,
-  blueColor
-) {
-  const rowHeight = 22;
-  let currentY = y;
-
-  // Calculate header height based on text wrapping
-  const maxHeaderWidth = width - 10;
-  const words = headerText.split(' ');
-  let lines = [];
-  let currentLine = '';
-
-  words.forEach(word => {
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    const testWidth = fontBold.widthOfTextAtSize(testLine, 9);
-    
-    if (testWidth > maxHeaderWidth && currentLine) {
-      lines.push(currentLine);
-      currentLine = word;
-    } else {
-      currentLine = testLine;
-    }
-  });
-  if (currentLine) lines.push(currentLine);
-
-  const headerHeight = Math.max(25, lines.length * 12 + 10);
-
-  // Draw main header with blue background
-  page.drawRectangle({
-    x,
-    y: currentY - headerHeight,
-    width,
-    height: headerHeight,
-    color: blueColor,
-    borderWidth: 1,
-    borderColor: black
-  });
-
-  // Draw wrapped header text
-  lines.forEach((line, idx) => {
-    page.drawText(line, {
-      x: x + 5,
-      y: currentY - 15 - (idx * 12),
-      size: 9,
-      font: fontBold
-    });
-  });
-
-  currentY -= headerHeight;
-
-  // Column headers
-  const colWidths = [width * 0.6, width * 0.4];
-  
-  page.drawRectangle({
-    x,
-    y: currentY - rowHeight,
-    width,
-    height: rowHeight,
-    color: lightBlue,
-    borderWidth: 1,
-    borderColor: black
-  });
-
-  page.drawText("Facility", {
-    x: x + 5,
-    y: currentY - 15,
-    size: 9,
-    font: fontBold
-  });
-  page.drawText("Scope 1 emissions", {
-    x: x + colWidths[0] + 5,
-    y: currentY - 15,
-    size: 9,
-    font: fontBold
-  });
-
-  // Vertical divider
-  page.drawLine({
-    start: { x: x + colWidths[0], y: currentY },
-    end: {
-      x: x + colWidths[0],
-      y: currentY - rowHeight * 3
-    },
-    thickness: 0.5,
-    color: black
-  });
-
-  currentY -= rowHeight;
-
-  // Only 2 data rows
-  const rowsToShow = facilities.length > 0 ? facilities.slice(0, 2) : [{}, {}];
-  while (rowsToShow.length < 2) {
-    rowsToShow.push({});
-  }
-
-  rowsToShow.forEach((f) => {
-    page.drawRectangle({
-      x,
-      y: currentY - rowHeight,
-      width,
-      height: rowHeight,
-      borderWidth: 1,
-      borderColor: black
-    });
-
-    const facilityName = f.facility || "";
-    const scope1 = f.scope1Emissions || "";
-
-    page.drawText(String(facilityName), {
-      x: x + 5,
-      y: currentY - 14,
-      size: 8,
-      font
-    });
-    page.drawText(String(scope1), {
-      x: x + colWidths[0] + 5,
-      y: currentY - 14,
-      size: 8,
-      font
-    });
-
-    currentY -= rowHeight;
-  });
-}
-
-// Helper: Country table with header (2 columns, 2 data rows)
-function drawCountryTableWithHeader(
-  page,
-  x,
-  y,
-  width,
-  headerText,
-  countries,
-  font,
-  fontBold,
-  blueColor
-) {
-  const rowHeight = 22;
-  let currentY = y;
-
-  // Calculate header height based on text wrapping
-  const maxHeaderWidth = width - 10;
-  const words = headerText.split(' ');
-  let lines = [];
-  let currentLine = '';
-
-  words.forEach(word => {
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    const testWidth = fontBold.widthOfTextAtSize(testLine, 9);
-    
-    if (testWidth > maxHeaderWidth && currentLine) {
-      lines.push(currentLine);
-      currentLine = word;
-    } else {
-      currentLine = testLine;
-    }
-  });
-  if (currentLine) lines.push(currentLine);
-
-  const headerHeight = Math.max(25, lines.length * 12 + 10);
-
-  // Draw main header with blue background
-  page.drawRectangle({
-    x,
-    y: currentY - headerHeight,
-    width,
-    height: headerHeight,
-    color: blueColor,
-    borderWidth: 1,
-    borderColor: black
-  });
-
-  // Draw wrapped header text
-  lines.forEach((line, idx) => {
-    page.drawText(line, {
-      x: x + 5,
-      y: currentY - 15 - (idx * 12),
-      size: 9,
-      font: fontBold
-    });
-  });
-
-  currentY -= headerHeight;
-
-  // Column headers
-  const colWidths = [width * 0.6, width * 0.4];
-  
-  page.drawRectangle({
-    x,
-    y: currentY - rowHeight,
-    width,
-    height: rowHeight,
-    color: lightBlue,
-    borderWidth: 1,
-    borderColor: black
-  });
-
-  page.drawText("Country", {
-    x: x + 5,
-    y: currentY - 15,
-    size: 9,
-    font: fontBold
-  });
-  page.drawText("Emissions (specify Scopes included)", {
-    x: x + colWidths[0] + 5,
-    y: currentY - 15,
-    size: 8,
-    font: fontBold
-  });
-
-  // Vertical divider
-  page.drawLine({
-    start: { x: x + colWidths[0], y: currentY },
-    end: {
-      x: x + colWidths[0],
-      y: currentY - rowHeight * 3
-    },
-    thickness: 0.5,
-    color: black
-  });
-
-  currentY -= rowHeight;
-
-  // Only 2 data rows
-  const rowsToShow = countries.length > 0 ? countries.slice(0, 2) : [{}, {}];
-  while (rowsToShow.length < 2) {
-    rowsToShow.push({});
-  }
-
-  rowsToShow.forEach((c) => {
-    page.drawRectangle({
-      x,
-      y: currentY - rowHeight,
-      width,
-      height: rowHeight,
-      borderWidth: 1,
-      borderColor: black
-    });
-
-    const countryName = c.country || "";
-    const emissions = c.emissions || "";
-
-    page.drawText(String(countryName), {
-      x: x + 5,
-      y: currentY - 14,
-      size: 8,
-      font
-    });
-    page.drawText(String(emissions), {
-      x: x + colWidths[0] + 5,
-      y: currentY - 14,
-      size: 8,
-      font
-    });
-
-    currentY -= rowHeight;
-  });
-}
-
-    // ============================================
-    // FINALIZE PDF
-    // ============================================
-    const pdfBytes = await pdfDoc.save();
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const filename = `GHG-Protocol-Report-${timestamp}.pdf`;
-
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="${filename}"`
-    );
-    res.setHeader("Content-Length", pdfBytes.length);
-    res.send(Buffer.from(pdfBytes));
-  } catch (err) {
-    console.log(err);
-    res
-      .status(500)
-      .json({ error: "PDF generation failed", detail: err.message });
-  }
 });
 
 
+// _________________________________________________________________________
+
+ 
 
 
+
+ 
 // ____________________________________________________________________________________________________________
 
 
